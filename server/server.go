@@ -2,12 +2,27 @@ package server
 
 import (
 	"fmt"
+	"html"
+	"html/template"
 	"net/http"
 )
 
+var tmpl = template.Must(template.ParseGlob("_templates_/*.html"))
+
 func homeHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "PAGE ACCEUIL")
+	if r.URL.Path != "/home" {
+		http.NotFound(w, r)
+		fmt.Printf("Error: handler for %s not found\n", html.EscapeString(r.URL.Path))
+		return
+	}
+
+	err := tmpl.ExecuteTemplate(w, "index.html", nil)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		fmt.Printf("Template error: %v\n", err)
+	}
 }
+
 func guessSoundHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Guess The Sound")
 }
