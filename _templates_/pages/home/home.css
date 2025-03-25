@@ -1,0 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Audiowide&display=swap');
+
+body {
+    background: #140826;
+}
+
+.card {
+    margin: 10px;
+    border-radius: 13px;
+    background: #4E54BF;
+    padding: 10px;
+}
+
+h1 {
+    color: #D7F20C;
+    text-align: center;
+    font-family: Audiowide;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+p {
+    color: white;
+}
+
+.btn-primary {
+    border-radius: 17px;
+    background: #4E54BF;
+    box-shadow: 4px 4px 4px 0px rgba(215, 242, 12, 0.32);
+    color: #FFF;
+    text-align: center;
+    font-family: Audiowide;
+    font-size: 32px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    margin: 30px;
+}
