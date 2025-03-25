@@ -7,8 +7,6 @@ import (
 	"net/http"
 )
 
-var tmpl = template.Must(template.ParseGlob("_templates_/*.html"))
-
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/home" {
 		http.NotFound(w, r)
@@ -16,7 +14,37 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := tmpl.ExecuteTemplate(w, "pages/home/home.html", nil)
+	tmpl := template.Must(template.ParseFiles("_templates_/pages/home/home.html"))
+	err := tmpl.Execute(w, nil)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		fmt.Printf("Template error: %v\n", err)
+	}
+}
+
+func loginHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/login" {
+		http.NotFound(w, r)
+		fmt.Printf("Error: handler for %s not found\n", html.EscapeString(r.URL.Path))
+		return
+	}
+
+	tmpl := template.Must(template.ParseFiles("_templates_/pages/login/login.html"))
+	err := tmpl.Execute(w, nil)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		fmt.Printf("Template error: %v\n", err)
+	}
+}
+func registerHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/register" {
+		http.NotFound(w, r)
+		fmt.Printf("Error: handler for %s not found\n", html.EscapeString(r.URL.Path))
+		return
+	}
+
+	tmpl := template.Must(template.ParseFiles("_templates_/pages/register/register.html"))
+	err := tmpl.Execute(w, nil)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		fmt.Printf("Template error: %v\n", err)
@@ -24,19 +52,24 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func guessSoundHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Guess The Sound")
+	if r.URL.Path != "/guess" {
+		http.NotFound(w, r)
+		fmt.Printf("Error: handler for %s not found\n", html.EscapeString(r.URL.Path))
+		return
+	}
+
+	tmpl := template.Must(template.ParseFiles("_templates_/pages/guess/guess.html"))
+	err := tmpl.Execute(w, nil)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		fmt.Printf("Template error: %v\n", err)
+	}
 }
 func petitBacHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Petit Bac")
 }
 func BlindTestHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Blind test")
-}
-func loginHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Page de connexion")
-}
-func registerHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Inscrivez vous")
 }
 
 func Start() {
