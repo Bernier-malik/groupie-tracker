@@ -1,0 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=Audiowide&display=swap');
+
+body {
+    background: #140826;
+    text-align: center;
+}
+
+.container{
+    padding: 30px;
+    margin-bottom: 20em;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+
+.card {
+    margin-top: 30px;
+    border-radius: 13px;
+    background: #1D1340;
+    padding: 10px;
+    display: inline-flex;
+    height: 188px;
+    padding: 0px 95px;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+h1 {
+    padding: 30px;
+    margin-top: 2em;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #4E54BF;
+    text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    font-family: Audiowide;
+    font-size: 64px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+h2 {
+    color: #FFF;
+    font-family: Audiowide;
+    font-size: 28px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+p {
+    color: white;
+}
+
+.btn-primary {
+    border-radius: 17px;
+    background: #4E54BF;
+    box-shadow: 4px 4px 4px 0px rgba(215, 242, 12, 0.32);
+    color: #FFF;
+    text-align: center;
+    font-family: Audiowide;
+    font-size: 32px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    margin: 30px;
+}
+
+.card:hover {
+    box-shadow: 4px 4px 4px 0px rgba(215, 242, 12, 0.32);
+    color: white;
+    transition: 0.5s;
+}
