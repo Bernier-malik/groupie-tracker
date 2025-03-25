@@ -16,7 +16,7 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := tmpl.ExecuteTemplate(w, "index.html", nil)
+	err := tmpl.ExecuteTemplate(w, "pages/home/home.html", nil)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		fmt.Printf("Template error: %v\n", err)
