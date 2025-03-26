@@ -37,19 +37,23 @@
             </div>
             <div class="col form">
                 <h1>INSCRIPTION</h1>
-                <form id="register-form">
+                <form id="register-form" action="/register" method="POST">
                     <div class="mb-3">
                         <label for="pseudo" class="form-label">Identifiant</label>
-                        <input type="text" class="form-control" id="pseudo" aria-describedby="artistHelp">
+                        <input type="text" class="form-control" id="pseudo" name="pseudo" aria-describedby="artistHelp" required>
                     
                     </div>
                     <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="mb-3">
                         <label for="password" class="form-label">Mot de passe</label>
-                        <input type="email" class="form-control" id="password" aria-describedby="emailHelp">
+                        <input type="password" class="form-control" id="password" name="password" aria-describedby="emailHelp" required>
                     </div>
                     <div class="mb-3">
                         <label for="confirm-password" class="form-label">Confirmer votre mot de passe</label>
-                        <input type="email" class="form-control" id="confirm-password" aria-describedby="emailHelp">
+                        <input type="password" class="form-control" id="confirm-password" name="confirm-password" aria-describedby="emailHelp" required>
                     </div>
                     <div class="mb-3">
                         <a class="form-label">Se connecter</a>
