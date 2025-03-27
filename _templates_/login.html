@@ -10,13 +10,13 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
-        <link rel="stylesheet" href="/_templates/pages/register/register.css">
+        <link rel="stylesheet" href="./css/login.css">
 </head>
 
 <header>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#"><img class="logo" src="/_templates/public/image/logo-groupie.png"/></a>
+            <a class="navbar-brand" href="#"><img class="logo" src="./public/image/logo-groupie.png"/></a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon">
@@ -36,8 +36,8 @@
                 </p>
             </div>
             <div class="col form">
-                <h1>INSCRIPTION</h1>
-                <form id="register-form">
+                <h1>Connexion</h1>
+                <form id="login-form">
                     <div class="mb-3">
                         <label for="pseudo" class="form-label">Identifiant</label>
                         <input type="text" class="form-control" id="pseudo" aria-describedby="artistHelp">
@@ -48,13 +48,9 @@
                         <input type="email" class="form-control" id="password" aria-describedby="emailHelp">
                     </div>
                     <div class="mb-3">
-                        <label for="confirm-password" class="form-label">Confirmer votre mot de passe</label>
-                        <input type="email" class="form-control" id="confirm-password" aria-describedby="emailHelp">
+                        <a class="form-label">Vous n'avez pas de compte ?</a>
                     </div>
-                    <div class="mb-3">
-                        <a class="form-label">Se connecter</a>
-                    </div>
-                    <button type="submit" class="btn btn-primary">S'inscrire</button>
+                    <button type="submit" class="btn btn-primary">Se connecter</button>
                 </form>
             </div>
         </div>
