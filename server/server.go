@@ -2,6 +2,8 @@ package server
 
 import (
 	"fmt"
+	"groupie/controllers"
+	"groupie/db"
 	"html"
 	"html/template"
 	"net/http"
@@ -14,7 +16,7 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("_templates_/pages/home/home.html"))
+	tmpl := template.Must(template.ParseFiles("_templates_/home.html"))
 	err := tmpl.Execute(w, nil)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -29,11 +31,15 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("_templates_/pages/login/login.html"))
-	err := tmpl.Execute(w, nil)
-	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		fmt.Printf("Template error: %v\n", err)
+	if r.Method == http.MethodGet {
+		tmpl := template.Must(template.ParseFiles("_templates_/login.html"))
+		err := tmpl.Execute(w, nil)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			fmt.Printf("Template error: %v\n", err)
+		}
+	} else if r.Method == http.MethodPost {
+		controllers.LoginUser(w, r)
 	}
 }
 func registerHandler(w http.ResponseWriter, r *http.Request) {
@@ -43,11 +49,15 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("_templates_/pages/register/register.html"))
-	err := tmpl.Execute(w, nil)
-	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		fmt.Printf("Template error: %v\n", err)
+	if r.Method == http.MethodGet {
+		tmpl := template.Must(template.ParseFiles("_templates_/register.html"))
+		err := tmpl.Execute(w, nil)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			fmt.Printf("Template error: %v\n", err)
+		}
+	} else if r.Method == http.MethodPost {
+		controllers.RegisterUser(w, r)
 	}
 }
 
@@ -58,7 +68,7 @@ func guessSoundHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("_templates_/pages/guess/guess.html"))
+	tmpl := template.Must(template.ParseFiles("_templates_/guess.html"))
 	err := tmpl.Execute(w, nil)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -73,6 +83,8 @@ func BlindTestHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func Start() {
+	db.InitDB()
+	defer db.CloseDB()
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "")
 	})
@@ -83,7 +95,6 @@ func Start() {
 	http.HandleFunc("/blind", BlindTestHandler)
 	http.HandleFunc("/login", loginHandler)
 	http.HandleFunc("/register", registerHandler)
-
 	fmt.Println("Serveur démarré sur le port 8080 ")
 	http.ListenAndServe(":8080", nil)
 }
