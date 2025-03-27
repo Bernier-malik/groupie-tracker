@@ -11,6 +11,7 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/home" {
 		http.NotFound(w, r)
 		fmt.Printf("Error: handler for %s not found\n", html.EscapeString(r.URL.Path))
+
 		return
 	}
 
@@ -26,6 +27,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/login" {
 		http.NotFound(w, r)
 		fmt.Printf("Error: handler for %s not found\n", html.EscapeString(r.URL.Path))
+
 		return
 	}
 
@@ -61,7 +63,7 @@ func guessSoundHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("_templates_/pages/guess/guess.html"))
 	err := tmpl.Execute(w, nil)
 	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		http.Error(w, "server error", http.StatusInternalServerError)
 		fmt.Printf("Template error: %v\n", err)
 	}
 }
@@ -76,14 +78,14 @@ func Start() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "")
 	})
-
 	http.HandleFunc("/home", homeHandler)
 	http.HandleFunc("/guess", guessSoundHandler)
 	http.HandleFunc("/petit", petitBacHandler)
 	http.HandleFunc("/blind", BlindTestHandler)
 	http.HandleFunc("/login", loginHandler)
 	http.HandleFunc("/register", registerHandler)
-
+	fs := http.FileServer(http.Dir("/static"))
+	http.Handle("/static/", http.StripPrefix("/static/", fs))
 	fmt.Println("Serveur démarré sur le port 8080 ")
 	http.ListenAndServe(":8080", nil)
 }
