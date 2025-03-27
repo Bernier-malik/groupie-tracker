@@ -1,0 +1,72 @@
+@import url('https://fonts.googleapis.com/css2?family=Audiowide&display=swap');
+
+body {
+    background: #140826;
+}
+
+h1 {
+    color: #4E54BF;
+    text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    font-family: Audiowide;
+    font-size: 64px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+h2 {
+    color: #FFF;
+    font-family: Audiowide;
+    font-size: 28px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+h3 {
+    color: #FFF;
+}
+
+p {
+    color: white;
+}
+
+input {
+    border-radius: 50px;
+    background: rgba(210, 133, 242, 0.50);
+    color: #FFF;
+    border: none;
+    padding: 12px 27px 12px 26px;
+}
+
+.col {
+    gap: 10px;
+}
+.card {
+    width: 473px;
+    height: 438px;
+    flex-shrink: 0;
+    background: rgba(210, 133, 242, 0.50);
+}
+.btn-primary {
+    border-radius: 50px;
+    background: #4E54BF;
+    display: inline-flex;
+    padding: 12px 27px 12px 26px;
+    justify-content: center;
+    align-items: center;
+}
+
+.group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+    margin: 10px;
+}
+
+.space {
+    border: #FFF 1px solid;
+    height: 1px;
+    margin: 0px 30px;
+}
