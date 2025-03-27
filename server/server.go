@@ -39,7 +39,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 			fmt.Printf("Template error: %v\n", err)
 		}
 	} else if r.Method == http.MethodPost {
-		controllers.LoginUser(w, r) // Call LoginUser from controllers
+		controllers.LoginUser(w, r)
 	}
 }
 func registerHandler(w http.ResponseWriter, r *http.Request) {
@@ -95,7 +95,6 @@ func Start() {
 	http.HandleFunc("/blind", BlindTestHandler)
 	http.HandleFunc("/login", loginHandler)
 	http.HandleFunc("/register", registerHandler)
-
 	fmt.Println("Serveur démarré sur le port 8080 ")
 	http.ListenAndServe(":8080", nil)
 }
