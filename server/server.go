@@ -42,6 +42,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		controllers.LoginUser(w, r)
 	}
 }
+
 func registerHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/register" {
 		http.NotFound(w, r)
@@ -68,16 +69,18 @@ func guessSoundHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("_templates_/guess.html"))
+	tmpl := template.Must(template.ParseFiles("_templates_/game-home.html"))
 	err := tmpl.Execute(w, nil)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		fmt.Printf("Template error: %v\n", err)
 	}
 }
+
 func petitBacHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Petit Bac")
 }
+
 func BlindTestHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Blind test")
 }
@@ -85,6 +88,9 @@ func BlindTestHandler(w http.ResponseWriter, r *http.Request) {
 func Start() {
 	db.InitDB()
 	defer db.CloseDB()
+
+	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("_templates_/css"))))
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "")
 	})
@@ -95,6 +101,7 @@ func Start() {
 	http.HandleFunc("/blind", BlindTestHandler)
 	http.HandleFunc("/login", loginHandler)
 	http.HandleFunc("/register", registerHandler)
+
 	fmt.Println("Serveur démarré sur le port 8080 ")
 	http.ListenAndServe(":8080", nil)
 }
