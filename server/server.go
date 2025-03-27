@@ -16,7 +16,7 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("_templates_/pages/home/home.html"))
+	tmpl := template.Must(template.ParseFiles("_templates_/home.html"))
 	err := tmpl.Execute(w, nil)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -32,7 +32,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodGet {
-		tmpl := template.Must(template.ParseFiles("_templates_/pages/login/login.html"))
+		tmpl := template.Must(template.ParseFiles("_templates_/login.html"))
 		err := tmpl.Execute(w, nil)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -50,7 +50,7 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodGet {
-		tmpl := template.Must(template.ParseFiles("_templates_/pages/register/register.html"))
+		tmpl := template.Must(template.ParseFiles("_templates_/register.html"))
 		err := tmpl.Execute(w, nil)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -61,32 +61,6 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// func RegisterUser(w http.ResponseWriter, r *http.Request) {
-// 	err := r.ParseForm()
-// 	if err != nil {
-// 		http.Error(w, "Invalid form data", http.StatusBadRequest)
-// 		return
-// 	}
-
-// 	email := r.FormValue("email")
-// 	pseudo := r.FormValue("pseudo")
-// 	password := r.FormValue("password")
-
-// 	//
-// 	// HashPassword_ToDo
-// 	//
-
-// 	query := `INSERT INTO players (email, pseudo, password) VALUES (?, ?, ?)`
-// 	_, err = db.DB.Exec(query, email, pseudo, password)
-// 	if err != nil {
-// 		http.Error(w, "Error creating user", http.StatusInternalServerError)
-// 		fmt.Println("Database error:", err)
-// 		return
-// 	}
-
-// 	http.Redirect(w, r, "/login", http.StatusSeeOther)
-// }
-
 func guessSoundHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/guess" {
 		http.NotFound(w, r)
@@ -94,7 +68,7 @@ func guessSoundHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("_templates_/pages/guess/guess.html"))
+	tmpl := template.Must(template.ParseFiles("_templates_/guess.html"))
 	err := tmpl.Execute(w, nil)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
