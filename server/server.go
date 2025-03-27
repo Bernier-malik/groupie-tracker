@@ -61,32 +61,6 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// func RegisterUser(w http.ResponseWriter, r *http.Request) {
-// 	err := r.ParseForm()
-// 	if err != nil {
-// 		http.Error(w, "Invalid form data", http.StatusBadRequest)
-// 		return
-// 	}
-
-// 	email := r.FormValue("email")
-// 	pseudo := r.FormValue("pseudo")
-// 	password := r.FormValue("password")
-
-// 	//
-// 	// HashPassword_ToDo
-// 	//
-
-// 	query := `INSERT INTO players (email, pseudo, password) VALUES (?, ?, ?)`
-// 	_, err = db.DB.Exec(query, email, pseudo, password)
-// 	if err != nil {
-// 		http.Error(w, "Error creating user", http.StatusInternalServerError)
-// 		fmt.Println("Database error:", err)
-// 		return
-// 	}
-
-// 	http.Redirect(w, r, "/login", http.StatusSeeOther)
-// }
-
 func guessSoundHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/guess" {
 		http.NotFound(w, r)
