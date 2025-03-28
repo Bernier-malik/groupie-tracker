@@ -202,6 +202,27 @@ func searchLyricsOnGenius(title, artist, geniusToken string) (string, error) {
 	return getLyricsFromGeniusPage(songURL)
 }
 
+func  delet(str string) string {
+	var frames int = len(str)
+	var result string = ""
+	var in bool = true
+	for i:= 0; i<frames; i++ {
+		if in == true{
+			if str[i] == '[' {
+				in = false 
+			} else {
+				result += str[i]
+			}
+		} else if in == false {
+			if str[i] == ']' {
+				in = true
+			}
+		}
+		
+	}
+	return result
+}
+
 func main() {
 	trackName := "One More Time"
 	artistName := "Daft Punk"
@@ -213,7 +234,7 @@ func main() {
 		log.Fatal("Erreur :", err)
 	}
 
-	fmt.Println("Track name : ", trackName, " artiste : ", artistName)
-	fmt.Println("----------------------------------------")
-	fmt.Println(lyrics)
+	//fmt.Println("Track name : ", trackName, " artiste : ", artistName)
+	//fmt.Println("----------------------------------------")
+	fmt.Println(delet(lyrics))
 }
