@@ -3,7 +3,6 @@ module groupie
 go 1.23.0
 
 require (
-  features/example-fetch-api-data
 	github.com/PuerkitoBio/goquery v1.10.2 // indirect
 	github.com/andybalholm/cascadia v1.3.3 // indirect
 	github.com/mattn/go-sqlite3 v1.14.24 // indirect
