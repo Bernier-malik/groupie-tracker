@@ -4,22 +4,23 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
 	"strings"
-	"io/ioutil"
 
 	"github.com/PuerkitoBio/goquery"
 )
-//Structure de recheche
+
+// Structure de recheche
 type SearchResponse struct {
 	Tracks struct {
 		Items []Track `json:"items"`
 	} `json:"tracks"`
 }
 
-//Structure de l'api Deezer
+// Structure de l'api Deezer
 type Track struct {
 	ID            int    `json:"id"`
 	Title         string `json:"title"`
@@ -95,11 +96,12 @@ type Track struct {
 }
 
 type TrackInfo struct {
-	ID            int    `json:"id"`
-	Title         string `json:"title"`
-	Artist        string `json:"artist"`
-	Album         string `json:"album"`
-	Preview	      string `json:"preview"`
+	ID      int    `json:"id"`
+	Title   string `json:"title"`
+	Artist  string `json:"artist"`
+	Album   string `json:"album"`
+	Preview string `json:"preview"`
+	Lyrics  string `json:"lyrics"`
 }
 
 type GeniusSearchResponse struct {
@@ -113,8 +115,8 @@ type GeniusSearchResponse struct {
 	} `json:"response"`
 }
 
-//Get track info from spotify
-func getTrack() (Track, error){
+// Get track info from spotify
+func getTrack() (Track, error) {
 	url := "https://api.deezer.com/playlist/13701736741"
 
 	// Création de la requête
@@ -175,28 +177,6 @@ func getLyricsFromGeniusPage(pageURL string) (string, error) {
 	return strings.TrimSpace(lyrics), nil
 }
 
-
-func getInfoTrack() ([]TrackInfo, string ){
-	trackInfo := []TrackInfo{}
-	track, nil := getTrack()
-
-	if nil != nil {
-		log.Fatal(nil)
-	}
-
-	for  i := 0; i < len(track.Tracks.Data); i++ {
-		trackInfo = append(trackInfo, TrackInfo{
-			ID:     track.Tracks.Data[i].ID,
-			Title:  track.Tracks.Data[i].Title,
-			Artist: track.Tracks.Data[i].Artist.Name,
-			Album:  track.Tracks.Data[i].Album.Title,
-			Preview: track.Tracks.Data[i].Preview,
-		})
-	}
-
-	return trackInfo, ""
-}
-
 func searchLyricsOnGenius(title, artist, geniusToken string) (string, error) {
 	query := fmt.Sprintf("%s %s", title, artist)
 	searchURL := "https://api.genius.com/search?q=" + url.QueryEscape(query)
@@ -230,10 +210,10 @@ func delete(str string) string {
 	var frames int = len(str)
 	var result string
 	var in bool = true
-	for i:= 0; i<frames; i++ {
-		if in == true{
+	for i := 0; i < frames; i++ {
+		if in == true {
 			if str[i] == '[' {
-				in = false 
+				in = false
 			} else {
 				result += string(str[i])
 			}
@@ -242,22 +222,40 @@ func delete(str string) string {
 				in = true
 			}
 		}
-		
+
 	}
 	return result
 }
 
+func getInfoTrack() ([]TrackInfo, string) {
+	geniusToken := "kqpwlWVEknmSRiSnXiFLtXbFW9pv0Nn92i9jWe9qywhY8jkD0W7TaHYwDxLSigYz"
+
+	trackInfo := []TrackInfo{}
+	track, nil := getTrack()
+
+	if nil != nil {
+		log.Fatal(nil)
+	}
+
+	for i := 0; i < len(track.Tracks.Data); i++ {
+		lyrics, err := searchLyricsOnGenius(track.Tracks.Data[i].Title, track.Tracks.Data[i].Artist.Name, geniusToken)
+		if err != nil {
+			log.Fatal("Erreur :", err)
+		}
+		trackInfo = append(trackInfo, TrackInfo{
+			ID:      track.Tracks.Data[i].ID,
+			Title:   track.Tracks.Data[i].Title,
+			Artist:  track.Tracks.Data[i].Artist.Name,
+			Album:   track.Tracks.Data[i].Album.Title,
+			Preview: track.Tracks.Data[i].Preview,
+			Lyrics:  delete(lyrics),
+		})
+	}
+
+	return trackInfo, ""
+}
+
 func main() {
-	// trackName := "One More Time"
-	// artistName := "Daft Punk"
-
-	// geniusToken := "kqpwlWVEknmSRiSnXiFLtXbFW9pv0Nn92i9jWe9qywhY8jkD0W7TaHYwDxLSigYz"
-
-	// lyrics, err := searchLyricsOnGenius(trackName, artistName, geniusToken)
-	// if err != nil {
-	// 	log.Fatal("Erreur :", err)
-	// }
-	// fmt.Println(delete(lyrics))
 	trackInfo, _ := getInfoTrack()
 
 	for _, track := range trackInfo {
