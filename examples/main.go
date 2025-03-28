@@ -1,11 +1,13 @@
 package main
 
 import (
+	"crypto/rand"
 	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
+	"math/big"
 	"net/http"
 	"net/url"
 	"strings"
@@ -227,6 +229,16 @@ func delete(str string) string {
 	return result
 }
 
+func getRandomtext(lyrics string) string {
+	var a []string = strings.Split(lyrics, ",")
+	n, err := rand.Int(rand.Reader, big.NewInt(int64(len(a))))
+	if err != nil {
+		return "aucunes phrases"
+	}
+	var result string = a[n.Int64()]
+	return result
+}
+
 func getInfoTrack() ([]TrackInfo, string) {
 	geniusToken := "kqpwlWVEknmSRiSnXiFLtXbFW9pv0Nn92i9jWe9qywhY8jkD0W7TaHYwDxLSigYz"
 
@@ -264,6 +276,7 @@ func main() {
 		fmt.Println("Artiste:", track.Artist)
 		fmt.Println("Album:", track.Album)
 		fmt.Println("Preview:", track.Preview)
-		fmt.Println()
+		fmt.Println("parole: ", getRandomtext(track.Lyrics) )
+
 	}
 }
