@@ -19,82 +19,87 @@ type SearchResponse struct {
 	} `json:"tracks"`
 }
 
-//Structure de l'api spotify
+//Structure de l'api Deezer
 type Track struct {
-	Album            Album          `json:"album"`
-	Artists          []Artist       `json:"artists"`
-	AvailableMarkets []string       `json:"available_markets"`
-	DiscNumber       int            `json:"disc_number"`
-	DurationMs       int            `json:"duration_ms"`
-	Explicit         bool           `json:"explicit"`
-	ExternalIDs      ExternalIDs    `json:"external_ids"`
-	ExternalURLs     ExternalURLs   `json:"external_urls"`
-	Href             string         `json:"href"`
-	ID               string         `json:"id"`
-	IsPlayable       bool           `json:"is_playable"`
-	LinkedFrom       json.RawMessage `json:"linked_from"` // champ vide ou inconnu
-	Restrictions     *Restrictions  `json:"restrictions,omitempty"`
-	Name             string         `json:"name"`
-	Popularity       int            `json:"popularity"`
-	PreviewURL       string         `json:"preview_url"`
-	TrackNumber      int            `json:"track_number"`
-	Type             string         `json:"type"`
-	URI              string         `json:"uri"`
-	IsLocal          bool           `json:"is_local"`
+	ID            int    `json:"id"`
+	Title         string `json:"title"`
+	Description   string `json:"description"`
+	Duration      int    `json:"duration"`
+	Public        bool   `json:"public"`
+	IsLovedTrack  bool   `json:"is_loved_track"`
+	Collaborative bool   `json:"collaborative"`
+	NbTracks      int    `json:"nb_tracks"`
+	Fans          int    `json:"fans"`
+	Link          string `json:"link"`
+	Share         string `json:"share"`
+	Picture       string `json:"picture"`
+	PictureSmall  string `json:"picture_small"`
+	PictureMedium string `json:"picture_medium"`
+	PictureBig    string `json:"picture_big"`
+	PictureXl     string `json:"picture_xl"`
+	Checksum      string `json:"checksum"`
+	Tracklist     string `json:"tracklist"`
+	CreationDate  string `json:"creation_date"`
+	AddDate       string `json:"add_date"`
+	ModDate       string `json:"mod_date"`
+	Md5Image      string `json:"md5_image"`
+	PictureType   string `json:"picture_type"`
+	Creator       struct {
+		ID        int    `json:"id"`
+		Name      string `json:"name"`
+		Tracklist string `json:"tracklist"`
+		Type      string `json:"type"`
+	} `json:"creator"`
+	Type   string `json:"type"`
+	Tracks struct {
+		Data []struct {
+			ID                    int    `json:"id"`
+			Readable              bool   `json:"readable"`
+			Title                 string `json:"title"`
+			TitleShort            string `json:"title_short"`
+			TitleVersion          string `json:"title_version,omitempty"`
+			Isrc                  string `json:"isrc"`
+			Link                  string `json:"link"`
+			Duration              int    `json:"duration"`
+			Rank                  int    `json:"rank"`
+			ExplicitLyrics        bool   `json:"explicit_lyrics"`
+			ExplicitContentLyrics int    `json:"explicit_content_lyrics"`
+			ExplicitContentCover  int    `json:"explicit_content_cover"`
+			Preview               string `json:"preview"`
+			Md5Image              string `json:"md5_image"`
+			TimeAdd               int    `json:"time_add"`
+			Artist                struct {
+				ID        int    `json:"id"`
+				Name      string `json:"name"`
+				Link      string `json:"link"`
+				Tracklist string `json:"tracklist"`
+				Type      string `json:"type"`
+			} `json:"artist"`
+			Album struct {
+				ID          int    `json:"id"`
+				Title       string `json:"title"`
+				Upc         string `json:"upc"`
+				Cover       string `json:"cover"`
+				CoverSmall  string `json:"cover_small"`
+				CoverMedium string `json:"cover_medium"`
+				CoverBig    string `json:"cover_big"`
+				CoverXl     string `json:"cover_xl"`
+				Md5Image    string `json:"md5_image"`
+				Tracklist   string `json:"tracklist"`
+				Type        string `json:"type"`
+			} `json:"album"`
+			Type string `json:"type"`
+		} `json:"data"`
+		Checksum string `json:"checksum"`
+	} `json:"tracks"`
 }
 
-type Album struct {
-	AlbumType            string         `json:"album_type"`
-	TotalTracks          int            `json:"total_tracks"`
-	AvailableMarkets     []string       `json:"available_markets"`
-	ExternalURLs         ExternalURLs   `json:"external_urls"`
-	Href                 string         `json:"href"`
-	ID                   string         `json:"id"`
-	Images               []Image        `json:"images"`
-	Name                 string         `json:"name"`
-	ReleaseDate          string         `json:"release_date"`
-	ReleaseDatePrecision string         `json:"release_date_precision"`
-	Restrictions         *Restrictions  `json:"restrictions,omitempty"`
-	Type                 string         `json:"type"`
-	URI                  string         `json:"uri"`
-	Artists              []Artist       `json:"artists"`
-}
-
-type Artist struct {
-	ExternalURLs ExternalURLs `json:"external_urls"`
-	Href         string       `json:"href"`
-	ID           string       `json:"id"`
-	Name         string       `json:"name"`
-	Type         string       `json:"type"`
-	URI          string       `json:"uri"`
-}
-
-type ExternalURLs struct {
-	Spotify string `json:"spotify"`
-}
-
-type ExternalIDs struct {
-	ISRC string `json:"isrc"`
-	EAN  string `json:"ean"`
-	UPC  string `json:"upc"`
-}
-
-type Image struct {
-	URL    string `json:"url"`
-	Height int    `json:"height"`
-	Width  int    `json:"width"`
-}
-
-type Restrictions struct {
-	Reason string `json:"reason"`
-}
-
-
-type TrackWithPreview struct {
-	TrackID    string `json:"track_id"`
-	TrackName  string `json:"track_name"`
-	ArtistName string `json:"artist_name"`
-	PreviewURL string `json:"preview_url"`
+type TrackInfo struct {
+	ID            int    `json:"id"`
+	Title         string `json:"title"`
+	Artist        string `json:"artist"`
+	Album         string `json:"album"`
+	Preview	      string `json:"preview"`
 }
 
 type GeniusSearchResponse struct {
@@ -109,17 +114,14 @@ type GeniusSearchResponse struct {
 }
 
 //Get track info from spotify
-func getSpotifyTrackId(token string, trackId string) (Track, error){
-	url := "https://api.spotify.com/v1/tracks/" + trackId
+func getTrack() (Track, error){
+	url := "https://api.deezer.com/playlist/13701736741"
 
 	// Création de la requête
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	// Attention : ne pas mettre ":" dans le nom du header
-	req.Header.Set("Authorization", "Bearer "+token)
 
 	// Envoi de la requête avec un client HTTP
 	client := &http.Client{}
@@ -173,6 +175,28 @@ func getLyricsFromGeniusPage(pageURL string) (string, error) {
 	return strings.TrimSpace(lyrics), nil
 }
 
+
+func getInfoTrack() ([]TrackInfo, string ){
+	trackInfo := []TrackInfo{}
+	track, nil := getTrack()
+
+	if nil != nil {
+		log.Fatal(nil)
+	}
+
+	for  i := 0; i < len(track.Tracks.Data); i++ {
+		trackInfo = append(trackInfo, TrackInfo{
+			ID:     track.Tracks.Data[i].ID,
+			Title:  track.Tracks.Data[i].Title,
+			Artist: track.Tracks.Data[i].Artist.Name,
+			Album:  track.Tracks.Data[i].Album.Title,
+			Preview: track.Tracks.Data[i].Preview,
+		})
+	}
+
+	return trackInfo, ""
+}
+
 func searchLyricsOnGenius(title, artist, geniusToken string) (string, error) {
 	query := fmt.Sprintf("%s %s", title, artist)
 	searchURL := "https://api.genius.com/search?q=" + url.QueryEscape(query)
@@ -202,16 +226,16 @@ func searchLyricsOnGenius(title, artist, geniusToken string) (string, error) {
 	return getLyricsFromGeniusPage(songURL)
 }
 
-func  delet(str string) string {
+func delete(str string) string {
 	var frames int = len(str)
-	var result string = ""
+	var result string
 	var in bool = true
 	for i:= 0; i<frames; i++ {
 		if in == true{
 			if str[i] == '[' {
 				in = false 
 			} else {
-				result += str[i]
+				result += string(str[i])
 			}
 		} else if in == false {
 			if str[i] == ']' {
@@ -224,17 +248,24 @@ func  delet(str string) string {
 }
 
 func main() {
-	trackName := "One More Time"
-	artistName := "Daft Punk"
+	// trackName := "One More Time"
+	// artistName := "Daft Punk"
 
-	geniusToken := "kqpwlWVEknmSRiSnXiFLtXbFW9pv0Nn92i9jWe9qywhY8jkD0W7TaHYwDxLSigYz"
+	// geniusToken := "kqpwlWVEknmSRiSnXiFLtXbFW9pv0Nn92i9jWe9qywhY8jkD0W7TaHYwDxLSigYz"
 
-	lyrics, err := searchLyricsOnGenius(trackName, artistName, geniusToken)
-	if err != nil {
-		log.Fatal("Erreur :", err)
+	// lyrics, err := searchLyricsOnGenius(trackName, artistName, geniusToken)
+	// if err != nil {
+	// 	log.Fatal("Erreur :", err)
+	// }
+	// fmt.Println(delete(lyrics))
+	trackInfo, _ := getInfoTrack()
+
+	for _, track := range trackInfo {
+		fmt.Println("----------------------------------------")
+		fmt.Println("Titre:", track.Title)
+		fmt.Println("Artiste:", track.Artist)
+		fmt.Println("Album:", track.Album)
+		fmt.Println("Preview:", track.Preview)
+		fmt.Println()
 	}
-
-	//fmt.Println("Track name : ", trackName, " artiste : ", artistName)
-	//fmt.Println("----------------------------------------")
-	fmt.Println(delet(lyrics))
 }
