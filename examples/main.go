@@ -214,13 +214,13 @@ func delete(str string) string {
 	var in bool = true
 	for i := 0; i < frames; i++ {
 		if in == true {
-			if str[i] == '[' {
+			if str[i] == '[' || str[i] == '(' {
 				in = false
 			} else {
 				result += string(str[i])
 			}
 		} else if in == false {
-			if str[i] == ']' {
+			if str[i] == ']' || str[i] == ')' {
 				in = true
 			}
 		}
@@ -229,9 +229,19 @@ func delete(str string) string {
 	return result
 }
 
+func space(str string) string {
+	var result string
+	for i:=0; i<len(str);i++ {
+		if str[i] != ' ' && str[i] != ',' {
+			result += string(str[i])
+		}
+	}
+	return result
+}
+
 func getRandomtext(lyrics string) string {
 	var a []string = strings.Split(lyrics, ",")
-	n, err := rand.Int(rand.Reader, big.NewInt(int64(len(a))))
+	n, err := rand.Int(rand.Reader, big.NewInt(int64(len(a)-2)))
 	if err != nil {
 		return "aucunes phrases"
 	}
@@ -267,16 +277,25 @@ func getInfoTrack() ([]TrackInfo, string) {
 	return trackInfo, ""
 }
 
+func checkRep(rep string, title string) bool {
+	var newrep string = strings.ToLower(space(delete((rep))))
+	var newtitle string = strings.ToLower(space(delete(title)))
+	return newrep == newtitle
+}
+
 func main() {
 	trackInfo, _ := getInfoTrack()
-
+	var rep string 
 	for _, track := range trackInfo {
+		
 		fmt.Println("----------------------------------------")
 		fmt.Println("Titre:", track.Title)
-		fmt.Println("Artiste:", track.Artist)
-		fmt.Println("Album:", track.Album)
-		fmt.Println("Preview:", track.Preview)
-		fmt.Println("Paroles:", track.Lyrics)
-		fmt.Println()
+		//fmt.Println("Artiste:", track.Artist)
+		//fmt.Println("Album:", track.Album)
+		fmt.Println("parole: ", getRandomtext(track.Lyrics))
+		fmt.Println(strings.ToLower(space(delete((track.Title)))))
+		fmt.Scan(&rep)
+		fmt.Println(checkRep(rep, track.Title))
+
 	}
 }
