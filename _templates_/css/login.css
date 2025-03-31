@@ -1,0 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=Audiowide&display=swap');
+
+body {
+    height: 100vh;
+    background: #140826;
+}
+
+.container {
+    padding: 30px;
+    margin-top: 20em;
+    margin-bottom: 20em;
+    flex-shrink: 0;
+    border-radius: 33px;
+    background: #1D1340;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+
+.desc {
+    margin: 10px;
+    text-align: justify;
+}
+
+h1 {
+    text-align: center;
+    font-family: "Audiowide", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.form h1 {
+    color: #D285F2;
+    text-align: center;
+    font-family: Audiowide;
+    font-size: 64px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.form input {
+    width: 529px;
+    height: 70px;
+    flex-shrink: 0;
+    border-radius: 9px;
+    background: rgba(210, 133, 242, 0.50);
+    box-shadow: 0px 4px 19.9px 0px rgba(255, 254, 254, 0.25);
+}
+
+label {
+    color: white;
+}
+
+.btn-primary {
+    border-radius: 17px;
+    background: #4E54BF;
+    box-shadow: 4px 4px 4px 0px rgba(215, 242, 12, 0.32);
+    border-radius: 17px;
+    background: #4E54BF;
+    box-shadow: 4px 4px 4px 0px rgba(215, 242, 12, 0.32);
+    color: #D8F213;
+    text-align: center;
+    font-family: Audiowide;
+    font-size: 32px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.logo {
+    width: 361px;
+    height: 203px;
+    flex-shrink: 0;
+    aspect-ratio: 361/203;
+}
