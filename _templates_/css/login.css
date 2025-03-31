@@ -32,7 +32,7 @@ h1 {
 }
 
 .form h1 {
-    color: #D285F2;
+    color: #4E54BF;
     text-align: center;
     font-family: Audiowide;
     font-size: 64px;
@@ -61,7 +61,7 @@ label {
     border-radius: 17px;
     background: #4E54BF;
     box-shadow: 4px 4px 4px 0px rgba(215, 242, 12, 0.32);
-    color: #D8F213;
+    color: white;
     text-align: center;
     font-family: Audiowide;
     font-size: 32px;
