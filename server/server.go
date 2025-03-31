@@ -20,7 +20,7 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 	err := tmpl.Execute(w, nil)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		fmt.Printf("Template error: %v\n", err)
+		fmt.Printf("erreur de template %s:", err)
 	}
 }
 
@@ -36,7 +36,8 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		err := tmpl.Execute(w, nil)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			fmt.Printf("Template error: %v\n", err)
+			fmt.Printf("erreur de template %s:", err)
+
 		}
 	} else if r.Method == http.MethodPost {
 		controllers.LoginUser(w, r)
@@ -55,25 +56,54 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		err := tmpl.Execute(w, nil)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			fmt.Printf("Template error: %v\n", err)
+			fmt.Printf("erreur de template %s:", err)
 		}
 	} else if r.Method == http.MethodPost {
 		controllers.RegisterUser(w, r)
 	}
 }
 
-func guessSoundHandler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/guess" {
+func gameHomeHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/game-home" {
 		http.NotFound(w, r)
-		fmt.Printf("Error: handler for %s not found\n", html.EscapeString(r.URL.Path))
 		return
 	}
 
 	tmpl := template.Must(template.ParseFiles("_templates_/game-home.html"))
 	err := tmpl.Execute(w, nil)
 	if err != nil {
+		http.Error(w, "Erreur de template", http.StatusInternalServerError)
+		fmt.Println(err)
+	}
+}
+
+func GameRoomHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/game-room" {
+		http.NotFound(w, r)
+		fmt.Printf("Error: handler for %s not found\n", html.EscapeString(r.URL.Path))
+		return
+	}
+
+	tmpl := template.Must(template.ParseFiles("_templates_/game-room.html"))
+	err := tmpl.Execute(w, nil)
+	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		fmt.Printf("Template error: %v\n", err)
+		fmt.Printf("erreur de template %s:", err)
+	}
+}
+
+func CreateRoomHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/create-room" {
+		http.NotFound(w, r)
+		fmt.Printf("Error: handler for %s not found\n", html.EscapeString(r.URL.Path))
+		return
+	}
+
+	tmpl := template.Must(template.ParseFiles("_templates_/create-room.html"))
+	err := tmpl.Execute(w, nil)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		fmt.Printf("erreur de template %s:", err)
 	}
 }
 
@@ -90,18 +120,25 @@ func Start() {
 	defer db.CloseDB()
 
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("_templates_/css"))))
+	http.Handle("/public/", http.StripPrefix("/public/", http.FileServer(http.Dir("_templates_/"))))
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "")
 	})
 
 	http.HandleFunc("/home", homeHandler)
-	http.HandleFunc("/guess", guessSoundHandler)
-	http.HandleFunc("/petit", petitBacHandler)
-	http.HandleFunc("/blind", BlindTestHandler)
 	http.HandleFunc("/login", loginHandler)
 	http.HandleFunc("/register", registerHandler)
+	http.HandleFunc("/game-home", gameHomeHandler)
+	http.HandleFunc("/game-room", controllers.GameRoomHandler)
+	http.HandleFunc("/petit", petitBacHandler)
+	http.HandleFunc("/blind", BlindTestHandler)
 
-	fmt.Println("Serveur démarré sur le port 8080 ")
+	http.HandleFunc("/create", controllers.CreateLobbyHandler)
+	http.HandleFunc("/create-room", CreateRoomHandler)
+	http.HandleFunc("/ws/game-home", controllers.GameWebSocket)
+	//http.HandleFunc("/ws/room", controllers.JoinLobby)
+
+	fmt.Println("Serveur démarré sur le port 8080")
 	http.ListenAndServe(":8080", nil)
 }

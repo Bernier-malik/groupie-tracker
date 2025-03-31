@@ -10,6 +10,21 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
+
+        <script>
+            const socket = new WebSocket("ws://localhost:8080/ws/game-home");
+        
+            socket.onmessage = function(event) {
+                document.getElementById("chat").textContent += event.data + "\n";
+            };
+        
+            function send() {
+                const msg = document.getElementById("msg").value;
+                socket.send(msg);
+                document.getElementById("msg").value = "";
+            }
+        </script>
+
     <link rel="stylesheet" href="./css/game-room.css">
 </head>
 
@@ -30,7 +45,7 @@
                         <form action="POST">
                             <h3>Code d'accès</h3>
                             <input type="number"/>
-                            <button type="submit" class="btn btn-primary">Regoindre</button>
+                            <button type="submit" class="btn btn-primary">Rejoindre</button>
                         </form>
                     </div>
                 </div>
