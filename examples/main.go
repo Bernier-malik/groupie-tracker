@@ -296,5 +296,6 @@ func main() {
 		fmt.Println(strings.ToLower(space(delete((track.Title)))))
 		fmt.Scan(&rep)
 		fmt.Println(checkRep(rep, track.Title))
+
 	}
 }
