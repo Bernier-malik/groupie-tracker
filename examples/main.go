@@ -231,7 +231,7 @@ func delete(str string) string {
 
 func getRandomtext(lyrics string) string {
 	var a []string = strings.Split(lyrics, ",")
-	n, err := rand.Int(rand.Reader, big.NewInt(int64(len(a))))
+	n, err := rand.Int(rand.Reader, big.NewInt(int64(len(a)-2)))
 	if err != nil {
 		return "aucunes phrases"
 	}
@@ -265,6 +265,16 @@ func getInfoTrack() ([]TrackInfo, string) {
 	}
 
 	return trackInfo, ""
+}
+
+func checkRep(rep string, title string) bool {
+	var newrep string = strings.ToLower(rep)
+	var newtitle string = strings.ToLower(title)
+	if newrep == newtitle {
+		return true
+	} else {
+		return false
+	}
 }
 
 func main() {
