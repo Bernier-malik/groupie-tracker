@@ -276,7 +276,7 @@ func main() {
 		fmt.Println("Artiste:", track.Artist)
 		fmt.Println("Album:", track.Album)
 		fmt.Println("Preview:", track.Preview)
-		fmt.Println("parole: ", getRandomtext(track.Lyrics) )
-
+		fmt.Println("Paroles:", track.Lyrics)
+		fmt.Println()
 	}
 }
