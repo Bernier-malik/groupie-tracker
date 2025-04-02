@@ -284,13 +284,27 @@ func updatePoint(joueur int, rep string, title string) int {
 	}
 }
 
-func guessTheSong() map[string]string {
-	trackInfo, _ := GetInfoTrack()
-	result := make(map[string]string)
+func Checkrequet(w http.ResponseWriter, r *http.Request) bool {
+	rep := r.FormValue("userReponse")
+	return checkRep(rep,"aaa")
+	
+}
 
-	for _, track := range trackInfo {
-		result[track.Title] = getRandomtext(track.Lyrics)
-	}
-
-	return result
+func GuessTheSong() []map[string]string {
+    trackInfo, _ := GetInfoTrack()
+    result := []map[string]string{}
+    
+    maxSongs := 5
+    count := 0
+    
+    for _, track := range trackInfo {
+        if count >= maxSongs {
+            break
+        }
+        
+        result = append(result, map[string]string{"title":  space(delete(track.Title)),"lyrics": getRandomtext(track.Lyrics),})
+        count++
+    }
+    
+    return result
 }
