@@ -85,6 +85,15 @@ func BlindTestHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Blind test")
 }
 
+func guessHandler(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("_templates_/guess-the-sound.html"))
+	err := tmpl.Execute(w, nil)
+	if err != nil {
+		http.Error(w, "Erreur de template", http.StatusInternalServerError)
+		fmt.Println(err)
+	}
+}
+
 func Start() {
 	db.InitDB()
 	defer db.CloseDB()
@@ -97,7 +106,7 @@ func Start() {
 	})
 
 	http.HandleFunc("/home", homeHandler)
-	//http.HandleFunc("/guess", )
+	http.HandleFunc("/guess", guessHandler)
 	http.HandleFunc("/petit", petitBacHandler)
 	http.HandleFunc("/blind", BlindTestHandler)
 	http.HandleFunc("/login", loginHandler)
