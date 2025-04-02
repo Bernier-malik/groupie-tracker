@@ -1,4 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Audiowide&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Aldrich&display=swap');
+
 
 body {
     height: 100vh;
@@ -10,13 +12,14 @@ body {
     margin-top: 20em;
     margin-bottom: 20em;
     flex-shrink: 0;
+    font-family: Aldrich;
     border-radius: 33px;
     background: #1D1340;
     box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
     display: flex;
     justify-content: center;
     align-items: center;
-    color: white;
+    color: #4E54BF;
 }
 
 .desc {
