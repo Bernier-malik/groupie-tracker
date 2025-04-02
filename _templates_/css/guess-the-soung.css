@@ -1,0 +1,84 @@
+@import url('https://fonts.googleapis.com/css2?family=Audiowide&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Aldrich&display=swap');
+
+body {
+    background: #140826;
+    text-align: center;
+}
+
+h1 {
+    color: #4E54BF;
+    text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    font-family: Audiowide;
+    font-size: 64px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.form input {
+    position: static;
+    text-align: center;
+    bottom: 18%;
+    padding: 3px;
+    width: 529px;
+    height: 70px;
+    flex-shrink: 0;
+    border-radius: 35px;
+    background: #4E54BF4D;
+    border-color: #140826;
+}
+
+.btn-primary {
+    position: sticky;
+    border-radius: 17px;
+    background: #4E54BF;
+    box-shadow: 4px 4px 4px 0px rgba(215, 242, 12, 0.32);
+    border-radius: 17px;
+    background: #4E54BF;
+    box-shadow: 4px 4px 4px 0px rgba(215, 242, 12, 0.32);
+    color: white;
+    text-align: center;
+    font-family: Audiowide;
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 200;
+    line-height: normal;
+}
+
+.parameter {
+    justify-content: space-between;
+    align-items: center;
+    color: whitesmoke;
+    font-family: Aldrich;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.lyric {
+    display: grid; 
+    place-items: center; 
+    height: 30vh;
+    color: whitesmoke;
+    font-family: Aldrich;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+h4 {
+    color: whitesmoke;
+    font-family: Aldrich;
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+hr {
+    border: 1px solid #4E54BF; 
+    margin: 20px 0;
+}
