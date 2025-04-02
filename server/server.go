@@ -80,13 +80,13 @@ func gameHomeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func guessBacHandler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/guess-the-soung" {
+	if r.URL.Path != "/guess-the-song" {
 		http.NotFound(w, r)
 		fmt.Printf("Error: handler for %s not found\n", html.EscapeString(r.URL.Path))
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("_templates_/guess-the-soung.html"))
+	tmpl := template.Must(template.ParseFiles("_templates_/guess-the-song.html"))
 	err := tmpl.Execute(w, nil)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -114,7 +114,7 @@ func Start() {
 	})
 
 	http.HandleFunc("/home", homeHandler)
-	http.HandleFunc("/guess", guessBacHandler)
+	http.HandleFunc("/guess-the-song", guessBacHandler)
 	http.HandleFunc("/petit", petitBacHandler)
 	http.HandleFunc("/blind", BlindTestHandler)
 	http.HandleFunc("/login", loginHandler)
