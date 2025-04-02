@@ -130,15 +130,13 @@ func Start() {
 	http.HandleFunc("/login", loginHandler)
 	http.HandleFunc("/register", registerHandler)
 	http.HandleFunc("/game-home", gameHomeHandler)
-	http.HandleFunc("/game-room", controllers.GameRoomHandler)
+	http.HandleFunc("/game-room", GameRoomHandler)
 	http.HandleFunc("/petit", petitBacHandler)
 	http.HandleFunc("/blind", BlindTestHandler)
 
 	http.HandleFunc("/create", controllers.CreateLobbyHandler)
 	http.HandleFunc("/create-room", CreateRoomHandler)
 	http.HandleFunc("/ws/game-home", controllers.GameWebSocket)
-	//http.HandleFunc("/ws/room", controllers.JoinLobby)
-
 	fmt.Println("Serveur démarré sur le port 8080")
 	http.ListenAndServe(":8080", nil)
 }
