@@ -1,4 +1,4 @@
-package main
+package controllers
 
 import (
 	"crypto/rand"
@@ -242,7 +242,7 @@ func getRandomtext(lyrics string) string {
 	return result
 }
 
-func getInfoTrack() ([]TrackInfo, string) {
+func GetInfoTrack() ([]TrackInfo, string) {
 	geniusToken := "kqpwlWVEknmSRiSnXiFLtXbFW9pv0Nn92i9jWe9qywhY8jkD0W7TaHYwDxLSigYz"
 
 	trackInfo := []TrackInfo{}
@@ -266,7 +266,7 @@ func getInfoTrack() ([]TrackInfo, string) {
 			Lyrics:  delete(lyrics),
 		})
 	}
-
+	
 	return trackInfo, ""
 }
 
@@ -284,22 +284,13 @@ func updatePoint(joueur int, rep string, title string) int {
 	}
 }
 
-func main() {
-	var p1 int = 0
-	trackInfo, _ := getInfoTrack()
-	var rep string 
-	for _, track := range trackInfo {
-		
-		fmt.Println("----------------------------------------")
-		fmt.Println("Titre:", track.Title)
-		//fmt.Println("Artiste:", track.Artist)
-		//fmt.Println("Album:", track.Album)
-		fmt.Println("parole: ", getRandomtext(track.Lyrics))
-		fmt.Println(strings.ToLower(space(delete((track.Title)))))
-		fmt.Scan(&rep)
-		p1 = updatePoint(p1 , rep , track.Title)
-		fmt.Println(checkRep(rep, track.Title))
-		fmt.Println("p1: ", p1)
+func guessTheSong() map[string]string {
+	trackInfo, _ := GetInfoTrack()
+	result := make(map[string]string)
 
+	for _, track := range trackInfo {
+		result[track.Title] = getRandomtext(track.Lyrics)
 	}
+
+	return result
 }
