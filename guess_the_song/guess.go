@@ -15,14 +15,12 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-// Structure de recheche
 type SearchResponse struct {
 	Tracks struct {
 		Items []Track `json:"items"`
 	} `json:"tracks"`
 }
 
-// Structure de l'api Deezer
 type Track struct {
 	ID            int    `json:"id"`
 	Title         string `json:"title"`
@@ -117,17 +115,14 @@ type GeniusSearchResponse struct {
 	} `json:"response"`
 }
 
-// Get track info from spotify
 func getTrack() (Track, error) {
 	url := "https://api.deezer.com/playlist/13701736741"
 
-	// Création de la requête
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Envoi de la requête avec un client HTTP
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -135,13 +130,11 @@ func getTrack() (Track, error) {
 	}
 	defer resp.Body.Close()
 
-	// Lecture de la réponse
 	body, readErr := ioutil.ReadAll(resp.Body)
 	if readErr != nil {
 		log.Fatal(readErr)
 	}
 
-	// Unmarshal du JSON dans ta structure
 	var track Track
 	jsonErr := json.Unmarshal(body, &track)
 	if jsonErr != nil {
@@ -283,7 +276,16 @@ func checkRep(rep string, title string) bool {
 	return newrep == newtitle
 }
 
+func updatePoint(joueur int, rep string, title string) int {
+	if checkRep(rep,title) == true {
+		return joueur+1
+	} else {
+		return joueur 
+	}
+}
+
 func main() {
+	var p1 int = 0
 	trackInfo, _ := getInfoTrack()
 	var rep string 
 	for _, track := range trackInfo {
@@ -295,7 +297,9 @@ func main() {
 		fmt.Println("parole: ", getRandomtext(track.Lyrics))
 		fmt.Println(strings.ToLower(space(delete((track.Title)))))
 		fmt.Scan(&rep)
+		p1 = updatePoint(p1 , rep , track.Title)
 		fmt.Println(checkRep(rep, track.Title))
+		fmt.Println("p1: ", p1)
 
 	}
 }
