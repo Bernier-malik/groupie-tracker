@@ -76,3 +76,11 @@ p {
     color: white;
     transition: 0.5s;
 }
+
+.custom-navbar {
+    background-color: #290041;
+}
+
+.nav-link {
+    font-family: Audiowide;
+}

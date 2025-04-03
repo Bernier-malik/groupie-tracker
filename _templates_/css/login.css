@@ -79,3 +79,11 @@ label {
     flex-shrink: 0;
     aspect-ratio: 361/203;
 }
+
+.custom-navbar {
+    background-color: #290041;
+}
+
+.nav-link {
+    font-family: Audiowide;
+}

@@ -14,7 +14,7 @@
 </head>
 
 <header>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary"  data-bs-theme="dark">
+    <nav class="navbar navbar-expand-lg custom-navbar"  data-bs-theme="dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="#"><img class="logo" src="./public/image/logo-groupie.png" width="200" height="50"/> </a>
                <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -23,8 +23,13 @@
                 <a class="nav-link active" aria-current="page" href="#">Home</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">Salles</a>
+                <a class="nav-link active" href="#">Salles</a>
               </li>
+            </ul>
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">Profil</a>
+                </li>
             </ul>
           </div>
         </div>
@@ -47,10 +52,10 @@
         </div>
         <div class="d-flex justify-content-center">
             <div class="form">
-                <h4>Ta réponse</h4>
+                <h4 class="text-start">Ta réponse</h4>
                 <form action="" method="post">
-                    <input type="text" class="form-control" id="userReponse">
-                    <button class="btn btn-primary" type="submit" id="submitReponse">Valider</button>
+                    <input type="text" class="form-control mb-2" id="userReponse">
+                    <button class="btn btn-primary float-end" type="submit" id="submitReponse">Valider</button>
                 </form>
             </div>
         </div>

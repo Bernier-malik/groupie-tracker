@@ -38,3 +38,11 @@ p {
     line-height: normal;
     margin: 30px;
 }
+
+.custom-navbar {
+    background-color: #290041;
+}
+
+.nav-link {
+    font-family: Audiowide;
+}
