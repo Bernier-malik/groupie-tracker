@@ -115,13 +115,16 @@ func guessHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Erreur de template", http.StatusInternalServerError)
 		fmt.Println(err)
 	}
-	guess := controllers.GuessTheSong()
-	fmt.Println(guess)
-	if r.Method == http.MethodGet {
-		fmt.Printf("non rien")
-	} else if r.Method == http.MethodPost {
-		fmt.Println(controllers.Checkrequet(w,r))
-	}
+	//guess := controllers.GuessTheSong()
+	//fmt.Println(guess[0].Title)
+	fmt.Println(r.FormValue("userReponse"))
+	
+
+	//if r.Method == http.MethodGet {
+	//	fmt.Printf("non rien")
+	//} else if r.Method == http.MethodPost {
+		//fmt.Println(controllers.Checkrequet(w,r))
+	//}
 }
 
 
