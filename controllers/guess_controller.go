@@ -105,8 +105,8 @@ type TrackInfo struct {
 }
 
 type TrackInfoResult struct {
-	Title   string `json:"title"`
-	Lyrics  string `json:"lyrics"`
+	Title  string `json:"title"`
+	Lyrics string `json:"lyrics"`
 }
 
 type GeniusSearchResponse struct {
@@ -229,7 +229,7 @@ func delete(str string) string {
 
 func space(str string) string {
 	var result string
-	for i:=0; i<len(str);i++ {
+	for i := 0; i < len(str); i++ {
 		if str[i] != ' ' && str[i] != ',' {
 			result += string(str[i])
 		}
@@ -271,7 +271,7 @@ func GetInfoTrack() ([]TrackInfo, string) {
 			Lyrics:  delete(lyrics),
 		})
 	}
-	
+
 	return trackInfo, ""
 }
 
@@ -282,37 +282,45 @@ func checkRep(rep string, title string) bool {
 }
 
 func updatePoint(joueur int, rep string, title string) int {
-	if checkRep(rep,title) == true {
-		return joueur+1
+	if checkRep(rep, title) == true {
+		return joueur + 1
 	} else {
-		return joueur 
+		return joueur
 	}
 }
 
 func Checkrequet(w http.ResponseWriter, r *http.Request) bool {
 	rep := r.FormValue("userReponse")
-	return checkRep(rep,"aaa")
-	
+	return checkRep(rep, "aaa")
+
 }
 
-func GuessTheSong() []TrackInfoResult {
-    trackInfo, _ := GetInfoTrack()
-    var result []TrackInfoResult
-    
-    maxSongs := 5
-    count := 0
-    
-    for _, track := range trackInfo {
-        if count >= maxSongs {
-            break
-        }
-        
-        result = append(result, TrackInfoResult{
-			Title: space(delete(track.Title)),
+func GuessTheSong(w http.ResponseWriter, r *http.Request) []TrackInfoResult {
+	trackInfo, _ := GetInfoTrack()
+	var result []TrackInfoResult
+
+	maxSongs := 5
+	count := 0
+
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, "Erreur lors de l'analyse du formulaire", http.StatusBadRequest)
+		fmt.Printf("Erreur ParseForm : %s\n", err)
+	}
+
+	for _, track := range trackInfo {
+		if count >= maxSongs {
+			break
+		}
+
+		result = append(result, TrackInfoResult{
+			Title:  space(delete(track.Title)),
 			Lyrics: delete(getRandomtext(track.Lyrics)),
 		})
-        count++
-    }
-    
-    return result
+		count++
+	}
+
+
+
+	return result
 }

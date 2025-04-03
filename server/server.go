@@ -109,22 +109,24 @@ func gameHomeHandler(w http.ResponseWriter, r *http.Request) {
 
 
 func guessHandler(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("_templates_/guess-the-song.html"))
-	err := tmpl.Execute(w, nil)
-	if err != nil {
-		http.Error(w, "Erreur de template", http.StatusInternalServerError)
-		fmt.Println(err)
-	}
-	//guess := controllers.GuessTheSong()
-	//fmt.Println(guess[0].Title)
-	fmt.Println(r.FormValue("userReponse"))
-	
-
-	//if r.Method == http.MethodGet {
-	//	fmt.Printf("non rien")
-	//} else if r.Method == http.MethodPost {
-		//fmt.Println(controllers.Checkrequet(w,r))
-	//}
+    if r.Method == http.MethodGet {
+        tmpl := template.Must(template.ParseFiles("_templates_/guess-the-song.html"))
+        err := tmpl.Execute(w, nil)
+        if err != nil {
+            http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+            fmt.Printf("Erreur de template : %s\n", err)
+        }
+    } else if r.Method == http.MethodPost {
+        err := r.ParseForm()
+        if err != nil {
+            http.Error(w, "erreur form", http.StatusBadRequest)
+            fmt.Printf("erreur parse : %s\n", err)
+            return
+        }
+        userResponse := r.FormValue("userReponse")
+        fmt.Println("user response :", userResponse)
+        //controllers.GuessTheSong(w, r)
+    }
 }
 
 
