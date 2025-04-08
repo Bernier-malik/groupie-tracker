@@ -111,11 +111,11 @@ type Data struct {
 	Tours int
 
 }
-
+var guess = controllers.GuessTheSong()
 var tours = 0
 
 func guessHandler(w http.ResponseWriter, r *http.Request) {
-	guess := controllers.GuessTheSong(w, r)
+	
 
 	if tours > 4 {
 		tours = 0

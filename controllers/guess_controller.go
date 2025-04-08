@@ -296,18 +296,13 @@ func Checkrequet(w http.ResponseWriter, r *http.Request) bool {
 
 }
 
-func GuessTheSong(w http.ResponseWriter, r *http.Request) []TrackInfoResult {
+func GuessTheSong() []TrackInfoResult {
 	trackInfo, _ := GetInfoTrack()
 	var result []TrackInfoResult
 
 	maxSongs := 5
 	count := 0
 
-	err := r.ParseForm()
-	if err != nil {
-		http.Error(w, "Erreur lors de l'analyse du formulaire", http.StatusBadRequest)
-		fmt.Printf("Erreur ParseForm : %s\n", err)
-	}
 
 	for _, track := range trackInfo {
 		if count >= maxSongs {
