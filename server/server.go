@@ -139,8 +139,8 @@ func guessHandler(w http.ResponseWriter, r *http.Request) {
 				fmt.Println("tours ++")
 				tours++
 				data.Tours = tours
-				
 				return
+
 			case <-time.After(1 * time.Second):
 				fmt.Println(data.Timer, "second")
 			}

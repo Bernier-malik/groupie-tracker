@@ -245,7 +245,11 @@ func getRandomtext(lyrics string) string {
 		return "aucunes phrases"
 	}
 	var result string = a[n.Int64()]
-	return result
+	if len(result) < 40 {
+		return getRandomtext(lyrics)
+	} else {
+		return result
+	}
 }
 
 func GetInfoTrack() ([]TrackInfo, string) {
