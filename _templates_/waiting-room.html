@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Petit Bac - Salle de Jeu</title>
+  <style>
+    body {
+      background-color: #130426;
+      font-family: 'Arial Rounded MT Bold', sans-serif;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #6c63ff;
+      font-size: 40px;
+      margin-bottom: 10px;
+    }
+
+    #roomInfo {
+      background-color: #1f1442;
+      padding: 10px 20px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+      font-size: 20px;
+    }
+
+    #playersList {
+      background-color: #2a1b4c;
+      padding: 20px;
+      border-radius: 15px;
+      width: 400px;
+    }
+
+    .playerItem {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-size: 18px;
+    }
+
+    .owner {
+      background-color: #9b61c0;
+    }
+
+    .normal {
+      background-color: #4f5bd5;
+    }
+
+    #controls {
+      margin-top: 30px;
+      display: flex;
+      gap: 15px;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #btnStart {
+      background-color: #4f5bd5;
+      color: white;
+    }
+
+    #btnLeave {
+      background-color: #d74a68;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>Salle de Jeu</h1>
+  <div id="roomInfo">Rejoindre la salle : <span id="roomCode">...</span> <span id="playerCount"></span></div>
+
+  <div id="playersList">
+    <h2>Joueurs</h2>
+    <div id="playerContainer"></div>
+  </div>
+
+  <div id="controls">
+    <button id="btnStart">Valider</button>
+    <button id="btnLeave">Quitter la salle</button>
+  </div>
+
+  <script>
+    // const ws = new WebSocket("ws://localhost:8080/lobby/ws");
+    const clientId = localStorage.getItem("clientId");
+    const gameId = localStorage.getItem("gameId");
+    console.log("🎮 Game ID:", gameId);
+
+    // const roomCode = document.getElementById("roomCode");
+    // const playerCount = document.getElementById("playerCount");
+    // const playerContainer = document.getElementById("playerContainer");
+
+    // ws.onopen = () => {
+    //   ws.send(JSON.stringify({
+    //     method: "rejoin",
+    //     clientId: clientId,
+    //     gameId: gameId
+    //   }));
+    // };
+
+    // ws.onmessage = message => {
+    //   const response = JSON.parse(message.data);
+
+    //   if (response.method === "join" || response.method === "update") {
+    //     const game = response.game;
+    //     roomCode.textContent = game.id;
+    //     playerCount.textContent = `${game.clients.length}/4`;
+    //     playerContainer.innerHTML = "";
+
+    //     game.clients.forEach(c => {
+    //       const div = document.createElement("div");
+    //       div.className = "playerItem " + (c.clientId === clientId ? "owner" : "normal");
+    //       div.innerHTML = `<span>${c.pseudo}</span> ${c.clientId === clientId ? '⭐' : ''}`;
+    //       playerContainer.appendChild(div);
+    //     });
+    //   }
+    // };
+
+    // document.getElementById("btnLeave").addEventListener("click", () => {
+    //   alert("Tu as quitté la salle.");
+    //   window.location.href = "/lobby";
+    // });
+
+    // document.getElementById("btnStart").addEventListener("click", () => {
+    //   ws.send(JSON.stringify({
+    //     method: "start",
+    //     gameId: gameId,
+    //     clientId: clientId
+    //   }));
+    //   window.location.href = "/game"; // redirect to actual game
+    // });
+  </script>
+</body>
+</html>

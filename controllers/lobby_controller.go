@@ -9,13 +9,19 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-type Client struct {
-	ID         string
+type ClientInfo struct {
+	ClientID   string
 	Pseudo     string
 	Connection *websocket.Conn
 }
+type Game struct {
+	GameID  string        `json:"id"`
+	Clients []*ClientInfo `json:"clients"`
+}
 
-var clients = make(map[string]*Client)
+var games = make(map[string]*Game)
+
+var clients = make(map[string]*ClientInfo)
 
 func HandleWS(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
@@ -33,8 +39,8 @@ func HandleWS(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("WebSocket connected by:", pseudo)
 
 	clientID := uuid.New().String()
-	clients[clientID] = &Client{
-		ID:         clientID,
+	clients[clientID] = &ClientInfo{
+		ClientID:   clientID,
 		Pseudo:     pseudo,
 		Connection: conn,
 	}
@@ -47,6 +53,56 @@ func HandleWS(w http.ResponseWriter, r *http.Request) {
 	}
 	payloadBytes, _ := json.Marshal(payload)
 	conn.WriteMessage(websocket.TextMessage, payloadBytes)
+
+	for {
+		_, msg, err := conn.ReadMessage()
+		if err != nil {
+			fmt.Println("Client disconnected:", clientID)
+			// delete(clients, clientID)
+			break
+		}
+
+		var result map[string]interface{}
+		err = json.Unmarshal(msg, &result)
+
+		if err != nil {
+			fmt.Println("Invalid message from client")
+			continue
+		}
+		method, ok := result["method"].(string)
+		if !ok {
+			continue
+		}
+
+		switch method {
+		case "create":
+			clientID, ok := result["clientId"].(string)
+			if !ok {
+				continue
+			}
+			gameID := uuid.New().String()
+
+			fmt.Println("Game created with ID:", gameID)
+			fmt.Println(pseudo, "with client ID", clientID, "created a new game")
+
+			// Add client to new game
+			game := &Game{
+				GameID: gameID,
+				Clients: []*ClientInfo{
+					{ClientID: clientID, Pseudo: pseudo},
+				},
+			}
+			games[gameID] = game
+
+			// Send game info to client
+			createPayload := map[string]interface{}{
+				"method": "create",
+				"gameId": gameID,
+			}
+			payloadBytes, _ := json.Marshal(createPayload)
+			clients[clientID].Connection.WriteMessage(websocket.TextMessage, payloadBytes)
+		}
+	}
 
 }
 
