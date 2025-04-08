@@ -118,7 +118,7 @@ func guessHandler(w http.ResponseWriter, r *http.Request) {
 	guess := controllers.GuessTheSong(w, r)
 
 	if tours > 4 {
-		http.HandleFunc("/home", homeHandler)
+		tours = 0
 	}
 
 	if r.Method == http.MethodGet {
@@ -147,12 +147,11 @@ func guessHandler(w http.ResponseWriter, r *http.Request) {
 		correct := controllers.CheckRep(userResponse, guess[tours].Title)
 		fmt.Println("Réponse correcte ?", correct)
 
-		tours++ // ⬅️ Incrémentation ici !
+		tours++
 
-		// Réaffiche la page avec le nouveau nombre de tours
 		data := Data{
 			Parole: guess[tours].Lyrics,
-			Tours:  tours,
+			Tours:  tours +1,
 		}
 		fmt.Println(guess[tours].Title)
 		tmpl := template.Must(template.ParseFiles("_templates_/guess-the-song.html"))
