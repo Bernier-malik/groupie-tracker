@@ -106,28 +106,64 @@ func gameHomeHandler(w http.ResponseWriter, r *http.Request) {
 
 
 
+type Data struct {
+	Parole string
+	Tours int 
 
+}
+
+var tours = 0
 
 func guessHandler(w http.ResponseWriter, r *http.Request) {
-    if r.Method == http.MethodGet {
-        tmpl := template.Must(template.ParseFiles("_templates_/guess-the-song.html"))
-        err := tmpl.Execute(w, nil)
-        if err != nil {
-            http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-            fmt.Printf("Erreur de template : %s\n", err)
-        }
-    } else if r.Method == http.MethodPost {
-        err := r.ParseForm()
-        if err != nil {
-            http.Error(w, "erreur form", http.StatusBadRequest)
-            fmt.Printf("erreur parse : %s\n", err)
-            return
-        }
-        userResponse := r.FormValue("userReponse")
-        fmt.Println("user response :", userResponse)
-        //controllers.GuessTheSong(w, r)
-    }
+	guess := controllers.GuessTheSong(w, r)
+
+	if tours > 4 {
+		http.HandleFunc("/home", homeHandler)
+	}
+
+	if r.Method == http.MethodGet {
+		data := Data{
+			Parole: guess[tours].Lyrics,
+			Tours:  tours+1,
+		}
+		
+		tmpl := template.Must(template.ParseFiles("_templates_/guess-the-song.html"))
+		err := tmpl.Execute(w, data)
+		if err != nil {
+			http.Error(w, "Erreur serveur", http.StatusInternalServerError)
+			fmt.Println("Erreur template :", err)
+		}
+	} else if r.Method == http.MethodPost {
+		err := r.ParseForm()
+		if err != nil {
+			http.Error(w, "Erreur dans le formulaire", http.StatusBadRequest)
+			fmt.Println("Erreur de parsing :", err)
+			return
+		}
+
+		userResponse := r.FormValue("userReponse")
+		fmt.Println("User response :", userResponse)
+
+		correct := controllers.CheckRep(userResponse, guess[tours].Title)
+		fmt.Println("Réponse correcte ?", correct)
+
+		tours++ // ⬅️ Incrémentation ici !
+
+		// Réaffiche la page avec le nouveau nombre de tours
+		data := Data{
+			Parole: guess[tours].Lyrics,
+			Tours:  tours,
+		}
+		fmt.Println(guess[tours].Title)
+		tmpl := template.Must(template.ParseFiles("_templates_/guess-the-song.html"))
+		err = tmpl.Execute(w, data)
+		if err != nil {
+			http.Error(w, "Erreur serveur", http.StatusInternalServerError)
+			fmt.Println("Erreur template :", err)
+		}
+	}
 }
+
 
 
 
