@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	petitbac "groupie/PetitBac"
+	"groupie/blindtest"
 	"groupie/controllers"
 	"groupie/db"
 	"html"
@@ -82,8 +83,52 @@ func petitBacHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Petit Bac")
 }
 
-func BlindTestHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Blind test")
+func blindTestHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		track, err := blindtest.GetRandomTrack()
+		if err != nil {
+			http.Error(w, "Erreur lors du chargement du son", http.StatusInternalServerError)
+			return
+		}
+
+		data := struct {
+			Preview string
+			Answer  string
+			Result  string
+		}{
+			Preview: track.Preview,
+			Answer:  track.Title,
+			Result:  "",
+		}
+
+		tmpl := template.Must(template.ParseFiles("_templates_/blindTest.html"))
+		tmpl.Execute(w, data)
+
+	} else if r.Method == http.MethodPost {
+		r.ParseForm()
+		guess := r.FormValue("guess")
+		answer := r.FormValue("answer")
+
+		var result string
+		if blindtest.CheckAnswer(guess, answer) {
+			result = fmt.Sprintf("✅ Bravo ! C'était bien : <strong>%s</strong>", answer)
+		} else {
+			result = fmt.Sprintf("❌ Mauvais ! La bonne réponse était : <strong>%s</strong>", answer)
+		}
+
+		data := struct {
+			Preview string
+			Answer  string
+			Result  string
+		}{
+			Preview: "",
+			Answer:  answer,
+			Result:  result,
+		}
+
+		tmpl := template.Must(template.ParseFiles("_templates_/blindTest.html"))
+		tmpl.Execute(w, data)
+	}
 }
 
 func gameRoomHandler(w http.ResponseWriter, r *http.Request) {
@@ -139,7 +184,7 @@ func Start() {
 	http.HandleFunc("/home", homeHandler)
 	http.HandleFunc("/guess", guessHandler)
 	http.HandleFunc("/petit", petitBacHandler)
-	http.HandleFunc("/blind", BlindTestHandler)
+	http.HandleFunc("/blind", blindTestHandler)
 	http.HandleFunc("/login", loginHandler)
 	http.HandleFunc("/register", registerHandler)
 	http.HandleFunc("/game-home", gameHomeHandler)

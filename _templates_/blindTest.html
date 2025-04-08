@@ -13,52 +13,60 @@
     <link rel="stylesheet" href="./css/blindTest.css">
 </head>
 
-<header>
-    <nav class="navbar navbar-expand-lg custom-navbar"  data-bs-theme="dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#"><img class="logo" src="./public/image/logo-groupie.png" width="200" height="50"/> </a>
-               <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-              <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="#">Home</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link active" href="#">Salles</a>
-              </li>
-            </ul>
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link active" href="#">Profil</a>
-                </li>
-            </ul>
-          </div>
-        </div>
-        </div>
-    </nav>
-</header>
-
 <body>
+    <header>
+        <nav class="navbar navbar-expand-lg custom-navbar" data-bs-theme="dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#"><img class="logo" src="./public/image/logo-groupie.png" width="200" height="50" /></a>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">Home</a></li>
+                        <li class="nav-item"><a class="nav-link active" href="#">Salles</a></li>
+                    </ul>
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                        <li class="nav-item"><a class="nav-link active" href="#">Profil</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
     <div class="container">
-        <h1>Blind Test</h1>
+        <h1 class="mt-4">Blind Test</h1>
         <hr>
+
+        <!-- Timer + Tours -->
         <div class="parameter">
             <div class="d-flex justify-content-between align-items-center my-3">
                 <div class="timer">Timer: <span id="timer">30</span>s</div>
                 <div class="tours">Tours: <span id="currentTour">1</span> / <span id="totalTours">5</span></div>
             </div>
         </div>
+
+        <!-- Audio -->
         <div class="lyric text-center my-4">
-            <h3>Animation ?</h3>
+            <h3>Écoute l'extrait 👇</h3>
+            <audio controls autoplay>
+                <source src="{{.Preview}}" type="audio/mpeg">
+                Ton navigateur ne supporte pas l'audio.
+            </audio>
         </div>
+
+        <!-- Formulaire de réponse -->
         <div class="d-flex justify-content-center">
             <div class="form">
                 <h4 class="text-start">Ta réponse</h4>
-                <form action="" method="post">
-                    <input type="text" class="form-control mb-2" id="userReponse">
+                <form action="/blind" method="post">
+                    <input type="text" class="form-control mb-2" id="userReponse" name="guess" placeholder="Nom de la chanson" required>
+                    <input type="hidden" name="answer" value="{{.Answer}}">
                     <button class="btn btn-primary float-end" type="submit" id="submitReponse">Valider</button>
                 </form>
             </div>
         </div>
     </div>
+    <!-- DEBUG-->
+<p class="text-muted mt-4">[Réponse attendue : {{.Answer}}]</p>
+
 </body>
+
 </html>
