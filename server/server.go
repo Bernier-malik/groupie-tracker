@@ -108,7 +108,7 @@ func gameHomeHandler(w http.ResponseWriter, r *http.Request) {
 
 type Data struct {
 	Parole string
-	Tours int 
+	Tours int
 
 }
 
@@ -119,7 +119,7 @@ func guessHandler(w http.ResponseWriter, r *http.Request) {
 
 	if tours > 4 {
 		tours = 0
-	}
+	} 
 
 	if r.Method == http.MethodGet {
 		data := Data{
