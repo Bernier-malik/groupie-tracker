@@ -50,8 +50,16 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Mot de passe incorrect")
 		return
 	}
+	// Set a cookie for the pseudo
+	cookie := &http.Cookie{
+		Name:     "pseudo",
+		Value:    pseudo,
+		Path:     "/",
+		HttpOnly: true,
+	}
+	http.SetCookie(w, cookie)
 
 	// If the password is correct, redirect to the game page
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	http.Redirect(w, r, "/lobby", http.StatusSeeOther)
 	fmt.Println("Connexion réussie. Redirection vers le jeu.")
 }
