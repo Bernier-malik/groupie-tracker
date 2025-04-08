@@ -95,10 +95,12 @@ func blindTestHandler(w http.ResponseWriter, r *http.Request) {
 			Preview string
 			Answer  string
 			Result  string
+			Score   int
 		}{
 			Preview: track.Preview,
 			Answer:  track.Title,
 			Result:  "",
+			Score:   1,
 		}
 
 		tmpl := template.Must(template.ParseFiles("_templates_/blindTest.html"))
@@ -108,9 +110,10 @@ func blindTestHandler(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
 		guess := r.FormValue("guess")
 		answer := r.FormValue("answer")
-
+		score := 1
 		var result string
 		if blindtest.CheckAnswer(guess, answer) {
+			score++
 			result = fmt.Sprintf("✅ Bravo ! C'était bien : <strong>%s</strong>", answer)
 		} else {
 			result = fmt.Sprintf("❌ Mauvais ! La bonne réponse était : <strong>%s</strong>", answer)
@@ -120,10 +123,12 @@ func blindTestHandler(w http.ResponseWriter, r *http.Request) {
 			Preview string
 			Answer  string
 			Result  string
+			Score   int
 		}{
 			Preview: "",
 			Answer:  answer,
 			Result:  result,
+			Score:   score,
 		}
 
 		tmpl := template.Must(template.ParseFiles("_templates_/blindTest.html"))
