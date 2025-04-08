@@ -78,6 +78,43 @@ func gameHomeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 type Data struct {
 	Parole string
 	Tours  int
@@ -91,7 +128,9 @@ func guessHandler(w http.ResponseWriter, r *http.Request) {
 	data := Data{
 		Parole: guess[tours].Lyrics,
 		Tours:  tours + 1,
+		Timer:  0,
 	}
+
 	go func() {
 		stop := time.After(30 * time.Second)
 		i := 0
@@ -103,9 +142,11 @@ func guessHandler(w http.ResponseWriter, r *http.Request) {
 			case <-time.After(1 * time.Second):
 				fmt.Println(data.Timer,"second")
 			}
-			data.Timer = i
 			i++
+			data.Timer = i
 		}
+		//tours++
+		//data.Tours =tours
 	}()
 	
 
@@ -154,6 +195,48 @@ func guessHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 func petitBacHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Petit Bac")
