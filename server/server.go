@@ -78,43 +78,6 @@ func gameHomeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 type Data struct {
 	Parole string
 	Tours  int
@@ -124,7 +87,42 @@ type Data struct {
 var guess = controllers.GuessTheSong()
 var tours = 0
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 func guessHandler(w http.ResponseWriter, r *http.Request) {
+
 	data := Data{
 		Parole: guess[tours].Lyrics,
 		Tours:  tours + 1,
@@ -138,17 +136,19 @@ func guessHandler(w http.ResponseWriter, r *http.Request) {
 			select {
 			case <-stop:
 				fmt.Println("EXIT: 30 seconds")
+				fmt.Println("tours ++")
+				tours++
+				data.Tours = tours
+				
 				return
 			case <-time.After(1 * time.Second):
-				fmt.Println(data.Timer,"second")
+				fmt.Println(data.Timer, "second")
 			}
 			i++
 			data.Timer = i
 		}
-		//tours++
-		//data.Tours =tours
+
 	}()
-	
 
 	if tours > 4 {
 		tours = 0
@@ -195,34 +195,6 @@ func guessHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
