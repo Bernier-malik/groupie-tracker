@@ -7,6 +7,7 @@ import (
 	"html"
 	"html/template"
 	"net/http"
+	"time"
 )
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
@@ -77,56 +78,47 @@ func gameHomeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 type Data struct {
 	Parole string
-	Tours int
-
+	Tours  int
+	Timer  int
 }
+
 var guess = controllers.GuessTheSong()
 var tours = 0
 
 func guessHandler(w http.ResponseWriter, r *http.Request) {
+	data := Data{
+		Parole: guess[tours].Lyrics,
+		Tours:  tours + 1,
+	}
+	go func() {
+		stop := time.After(30 * time.Second)
+		i := 0
+		for {
+			select {
+			case <-stop:
+				fmt.Println("EXIT: 30 seconds")
+				return
+			case <-time.After(1 * time.Second):
+				fmt.Println(data.Timer,"second")
+			}
+			data.Timer = i
+			i++
+		}
+	}()
 	
 
 	if tours > 4 {
 		tours = 0
-	} 
+	}
 
 	if r.Method == http.MethodGet {
 		data := Data{
 			Parole: guess[tours].Lyrics,
-			Tours:  tours+1,
+			Tours:  tours + 1,
 		}
-		
+
 		tmpl := template.Must(template.ParseFiles("_templates_/guess-the-song.html"))
 		err := tmpl.Execute(w, data)
 		if err != nil {
@@ -151,7 +143,7 @@ func guessHandler(w http.ResponseWriter, r *http.Request) {
 
 		data := Data{
 			Parole: guess[tours].Lyrics,
-			Tours:  tours +1,
+			Tours:  tours + 1,
 		}
 		fmt.Println(guess[tours].Title)
 		tmpl := template.Must(template.ParseFiles("_templates_/guess-the-song.html"))
@@ -162,29 +154,6 @@ func guessHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 func petitBacHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Petit Bac")
