@@ -140,7 +140,7 @@
           const gameId = response.gameId;
           clientId = localStorage.getItem("clientId");
           localStorage.setItem("gameId", gameId);
-          window.location.href = `/waiting-room?id=${gameId}&client=${clientId}`;
+          window.location.href = `/waiting-room?id=${gameId}&pseudo=${pseudo}&client=${clientId}`;
         }
       };
 

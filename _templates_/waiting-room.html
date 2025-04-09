@@ -91,28 +91,39 @@
     </div>
 
     <script>
-      const ws = new WebSocket("ws://localhost:8080/lobby/ws");
+      ws = new WebSocket("ws://localhost:8080/lobby/ws");
       const clientId = localStorage.getItem("clientId");
       const pseudo = localStorage.getItem("pseudo");
       const params = new URLSearchParams(window.location.search);
       const gameId = params.get("id");
+      const connection =localStorage.getItem("connection");
 
       console.log(" GameId:", gameId);
       console.log(" Pseudo:", pseudo);
       console.log(" Client ID:", clientId);
+      console.log("Connection:", connection)
+      console.log(typeof connection) 
 
       ws.onopen = () => {
         ws.send(
           JSON.stringify({
             method: "rejoin",
-            clientId: clientId,
             gameId: gameId,
+            pseudo: pseudo,
           })
         );
       };
 
       ws.onmessage = (message) => {
         const response = JSON.parse(message.data);
+
+        if (response.method === "redirect") {
+          window.location.href = response.url;
+        }
+
+        if (response.method === "alert") {
+          alert(response.message);
+        }
 
         if (response.method === "update") {
           const game = response.game;
@@ -144,11 +155,14 @@
       });
 
       document.getElementById("btnStart").addEventListener("click", () => {
-        // Later: Check if enough players and start the game
-        console.log("Start game requested...");
-        // Add WebSocket message for 'start' if needed
+        ws.send(
+          JSON.stringify({
+            method: "start",
+            gameId: gameId,
+            clientId: clientId,
+          })
+        );
       });
     </script>
   </body>
 </html>
-
