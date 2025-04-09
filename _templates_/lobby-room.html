@@ -113,6 +113,7 @@
 
     <script>
       let clientId = null;
+      let pseudo = null;
       let ws = new WebSocket("ws://localhost:8080/lobby/ws");
 
       ws.onopen = () => {
@@ -125,28 +126,42 @@
 
       ws.onmessage = (message) => {
         const response = JSON.parse(message.data);
-
         if (response.method === "connect") {
           clientId = response.clientId;
           pseudo = response.pseudo;
+          localStorage.setItem("clientId", clientId);
+          localStorage.setItem("pseudo", pseudo);
+          localStorage.setItem("connection", response.connection);
           console.log("Client ID set successfully:", clientId);
           console.log("Pseudo : ", pseudo);
+          console.log(response.connection);
         }
         if (response.method === "create") {
           const gameId = response.gameId;
-          console.log(`${pseudo} has created a game`)
-          console.log("GameID:"+ gameId);
+          clientId = localStorage.getItem("clientId");
           localStorage.setItem("gameId", gameId);
-          window.location.href = "/waiting-room";
+          window.location.href = `/waiting-room?id=${gameId}&client=${clientId}`;
         }
       };
 
       document.getElementById("btnCreate").addEventListener("click", () => {
         const payload = {
-          "method": "create",
-          "clientId": clientId,
+          method: "create",
+          clientId: clientId,
         };
         ws.send(JSON.stringify(payload));
+      });
+
+      document.getElementById("btnJoin").addEventListener("click", () => {
+        const gameId = document.getElementById("txtGameId").value;
+
+        if (!gameId) {
+          alert("Veuillez entrer un code de partie.");
+          return;
+        }
+        clientId = localStorage.getItem("clientId");
+
+        window.location.href = `/waiting-room?id=${gameId}&client=${clientId}`;
       });
     </script>
   </body>

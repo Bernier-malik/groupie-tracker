@@ -93,9 +93,6 @@ func guessHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 }
-func ServeWaitingRoom(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "_templates_/waiting-room.html")
-}
 
 func Start() {
 	db.InitDB()
@@ -118,7 +115,7 @@ func Start() {
 	http.HandleFunc("/ws/game-home", controllers.GameWebSocket)
 	http.HandleFunc("/lobby", controllers.ServeLobbyPage)
 	http.HandleFunc("/lobby/ws", controllers.HandleWS)
-	http.HandleFunc("/waiting-room", ServeWaitingRoom)
+	http.HandleFunc("/waiting-room", controllers.ServeWaitingRoom)
 
 	fmt.Println("Serveur démarré sur le port 8080 ")
 	http.ListenAndServe(":8080", nil)

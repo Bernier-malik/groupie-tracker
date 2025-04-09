@@ -1,146 +1,154 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <title>Petit Bac - Salle de Jeu</title>
-  <style>
-    body {
-      background-color: #130426;
-      font-family: 'Arial Rounded MT Bold', sans-serif;
-      color: white;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <title>Petit Bac - Salle de Jeu</title>
+    <style>
+      body {
+        background-color: #130426;
+        font-family: "Arial Rounded MT Bold", sans-serif;
+        color: white;
+        padding: 40px;
+      }
 
-    h1 {
-      color: #6c63ff;
-      font-size: 40px;
-      margin-bottom: 10px;
-    }
+      .room-info {
+        background-color: #1f1442;
+        padding: 20px;
+        border-radius: 10px;
+        font-size: 22px;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 30px;
+      }
 
-    #roomInfo {
-      background-color: #1f1442;
-      padding: 10px 20px;
-      border-radius: 10px;
-      margin-bottom: 30px;
-      font-size: 20px;
-    }
+      .joueur {
+        background-color: #6d3a89;
+        margin: 10px 0;
+        padding: 15px;
+        border-radius: 10px;
+        font-size: 18px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
 
-    #playersList {
-      background-color: #2a1b4c;
-      padding: 20px;
-      border-radius: 15px;
-      width: 400px;
-    }
+      .creator {
+        background-color: #9b61c0;
+      }
 
-    .playerItem {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
-      padding: 10px 20px;
-      border-radius: 12px;
-      font-size: 18px;
-    }
+      .star {
+        color: yellow;
+        font-size: 24px;
+      }
 
-    .owner {
-      background-color: #9b61c0;
-    }
+      .btn-container {
+        display: flex;
+        justify-content: flex-end;
+        gap: 15px;
+        margin-top: 40px;
+      }
 
-    .normal {
-      background-color: #4f5bd5;
-    }
+      .btn {
+        padding: 12px 25px;
+        font-size: 16px;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+      }
 
-    #controls {
-      margin-top: 30px;
-      display: flex;
-      gap: 15px;
-    }
+      .btn-play {
+        background-color: #4f5bd5;
+        color: white;
+      }
 
-    button {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 20px;
-      font-size: 16px;
-      cursor: pointer;
-    }
+      .btn-leave {
+        background-color: #d74a68;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Salle de Jeu</h1>
 
-    #btnStart {
-      background-color: #4f5bd5;
-      color: white;
-    }
+    <div class="room-info">
+      <div>Rejoindre la salle : <strong>{{.GameID}}</strong></div>
+      <div>{{len .Clients}}/4</div>
+    </div>
 
-    #btnLeave {
-      background-color: #d74a68;
-      color: white;
-    }
-  </style>
-</head>
-<body>
-  <h1>Salle de Jeu</h1>
-  <div id="roomInfo">Rejoindre la salle : <span id="roomCode">...</span> <span id="playerCount"></span></div>
-
-  <div id="playersList">
     <h2>Joueurs</h2>
-    <div id="playerContainer"></div>
-  </div>
+    <div id="playerList">
+      {{range .Clients}}
+      <div class="joueur {{if eq .ClientID $.CreatorID}}creator{{end}}">
+        <span>{{.Pseudo}}</span>
+        {{if eq .ClientID $.CreatorID}}<span class="star">⭐</span>{{end}}
+      </div>
+      {{end}}
+    </div>
 
-  <div id="controls">
-    <button id="btnStart">Valider</button>
-    <button id="btnLeave">Quitter la salle</button>
-  </div>
+    <div class="btn-container">
+      <button id="btnStart" class="btn btn-play">Jouer</button>
+      <button id="btnLeave" class="btn btn-leave">Quitter la salle</button>
+    </div>
 
-  <script>
-    // const ws = new WebSocket("ws://localhost:8080/lobby/ws");
-    const clientId = localStorage.getItem("clientId");
-    const gameId = localStorage.getItem("gameId");
-    console.log("🎮 Game ID:", gameId);
+    <script>
+      const ws = new WebSocket("ws://localhost:8080/lobby/ws");
+      const clientId = localStorage.getItem("clientId");
+      const pseudo = localStorage.getItem("pseudo");
+      const params = new URLSearchParams(window.location.search);
+      const gameId = params.get("id");
 
-    // const roomCode = document.getElementById("roomCode");
-    // const playerCount = document.getElementById("playerCount");
-    // const playerContainer = document.getElementById("playerContainer");
+      console.log(" GameId:", gameId);
+      console.log(" Pseudo:", pseudo);
+      console.log(" Client ID:", clientId);
 
-    // ws.onopen = () => {
-    //   ws.send(JSON.stringify({
-    //     method: "rejoin",
-    //     clientId: clientId,
-    //     gameId: gameId
-    //   }));
-    // };
+      ws.onopen = () => {
+        ws.send(
+          JSON.stringify({
+            method: "rejoin",
+            clientId: clientId,
+            gameId: gameId,
+          })
+        );
+      };
 
-    // ws.onmessage = message => {
-    //   const response = JSON.parse(message.data);
+      ws.onmessage = (message) => {
+        const response = JSON.parse(message.data);
 
-    //   if (response.method === "join" || response.method === "update") {
-    //     const game = response.game;
-    //     roomCode.textContent = game.id;
-    //     playerCount.textContent = `${game.clients.length}/4`;
-    //     playerContainer.innerHTML = "";
+        if (response.method === "update") {
+          const game = response.game;
 
-    //     game.clients.forEach(c => {
-    //       const div = document.createElement("div");
-    //       div.className = "playerItem " + (c.clientId === clientId ? "owner" : "normal");
-    //       div.innerHTML = `<span>${c.pseudo}</span> ${c.clientId === clientId ? '⭐' : ''}`;
-    //       playerContainer.appendChild(div);
-    //     });
-    //   }
-    // };
+          // Update room info
+          document.querySelector(".room-info").innerHTML = `
+            <div>Rejoindre la salle : <strong>${game.id}</strong></div>
+            <div>${game.clients.length}/4</div>
+          `;
 
-    // document.getElementById("btnLeave").addEventListener("click", () => {
-    //   alert("Tu as quitté la salle.");
-    //   window.location.href = "/lobby";
-    // });
+          const playersHTML = game.clients
+            .map((c) => {
+              const isCreator = c.clientId === game.creatorId;
+              return `
+              <div class="joueur ${isCreator ? "creator" : ""}">
+                <span>${c.pseudo}</span>
+                ${isCreator ? '<span class="star">⭐</span>' : ""}
+              </div>`;
+            })
+            .join("");
 
-    // document.getElementById("btnStart").addEventListener("click", () => {
-    //   ws.send(JSON.stringify({
-    //     method: "start",
-    //     gameId: gameId,
-    //     clientId: clientId
-    //   }));
-    //   window.location.href = "/game"; // redirect to actual game
-    // });
-  </script>
-</body>
+          document.getElementById("playerList").innerHTML = playersHTML;
+        }
+      };
+
+      document.getElementById("btnLeave").addEventListener("click", () => {
+        alert("Vous avez quitté la salle.");
+        window.location.href = "/lobby";
+      });
+
+      document.getElementById("btnStart").addEventListener("click", () => {
+        // Later: Check if enough players and start the game
+        console.log("Start game requested...");
+        // Add WebSocket message for 'start' if needed
+      });
+    </script>
+  </body>
 </html>
+
