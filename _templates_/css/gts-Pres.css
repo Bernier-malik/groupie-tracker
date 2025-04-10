@@ -16,6 +16,10 @@ body {
     font-family: Audiowide;
 }
 
+hr {
+    border: 1px solid #4E54BF; 
+    margin: 20px 0;
+}
 
 h1 {
     color: #4E54BF;
@@ -31,24 +35,59 @@ h1 {
     text-align: center;
     background: #1D1340;
     margin: 4%;
-    padding: 5%;
+    padding: 2%;
 }
 
 .text {
     margin-top: 4%;
 }
 
-.container-params {
+.params {
     background: #4E54BF4D;
-    margin-top: 10%;
+    margin-top: 7%;
+    padding: 2%;
 }
 
 .container-params2 {
-    margin-top: 10%;
+    margin-top: 2%;
+    margin-left: 5%;
     height: auto;
+    background: #4E54BF4D;
+    padding: 2%;
+    border-radius: 20px;
 }
 
-.text-start {
-    margin-left: 5%;
-    margin-top: 10%;
+.titrePara{
+    font-size: 15px;
+}
+
+.pseudo {
+    margin-top: 10px;
+    font-size: 20px;
+}
+
+.btn-primary {
+    position: sticky;
+    border-radius: 10px;
+    background: #D285F280;
+    box-shadow: 3px 3px 3px 0px #d185f24d;
+    color: white;
+    text-align: center;
+    font-family: Audiowide;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 300;
+    line-height: normal;
+    border: #D285F280;
+    padding-left: 10%;
+    padding-right: 10%;
+}
+
+.container-button {
+    padding: 4%;
+}
+
+.btn-checkr{
+    background:#4E54BF;
+    color: white;
 }
