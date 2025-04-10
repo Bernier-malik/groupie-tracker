@@ -14,14 +14,25 @@
 </head>
 
 <header>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg custom-navbar"  data-bs-theme="dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#"><img class="logo" src="./public/image/logo-groupie.png"/></a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon">
-                </span>
-            </button>
+            <a class="navbar-brand" href="#"><img class="logo" src="./public/image/logo-groupie.png" width="200" height="50"/> </a>
+               <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="#">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link active" href="#">Salles</a>
+              </li>
+            </ul>
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">Profil</a>
+                </li>
+            </ul>
+          </div>
+        </div>
         </div>
     </nav>
 </header>
@@ -63,11 +74,11 @@
                 <form id="login-form" action="/login" method="POST">
                     <div class="mb-3">
                         <label for="pseudo" class="form-label">Identifiant</label>
-                        <input type="text" class="form-control" id="pseudo"  name="pseudo" aria-describedby="artistHelp" required>
+                        <input type="text" class="form-control" id="pseudo"  name="pseudo" required>
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">Mot de passe</label>
-                        <input type="password" class="form-control" id="password" name="password" aria-describedby="emailHelp" required>
+                        <input type="password" class="form-control" id="password" name="password" required>
                     </div>
                     <div class="mb-3">
                         <a class="form-label">Vous n'avez pas de compte ?</a>

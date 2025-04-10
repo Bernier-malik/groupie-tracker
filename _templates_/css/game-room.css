@@ -70,3 +70,11 @@ input {
     height: 1px;
     margin: 0px 30px;
 }
+
+.custom-navbar {
+    background-color: #290041;
+}
+
+.nav-link {
+    font-family: Audiowide;
+}

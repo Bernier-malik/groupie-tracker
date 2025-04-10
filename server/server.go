@@ -187,6 +187,23 @@ func BlindTestHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Blind test")
 }
 
+func gameRoomHandler(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("_templates_/game-room.html"))
+	err := tmpl.Execute(w, nil)
+	if err != nil {
+		http.Error(w, "Erreur de template", http.StatusInternalServerError)
+		fmt.Println(err)
+	}
+}
+func guessHandler(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("_templates_/guessTheSong.html"))
+	err := tmpl.Execute(w, nil)
+	if err != nil {
+		http.Error(w, "Erreur de template", http.StatusInternalServerError)
+		fmt.Println(err)
+	}
+}
+
 func Start() {
 	db.InitDB()
 	defer db.CloseDB()
@@ -195,7 +212,7 @@ func Start() {
 	http.Handle("/public/", http.StripPrefix("/public/", http.FileServer(http.Dir("_templates_/"))))
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "")
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
 	})
 
 	http.HandleFunc("/home", homeHandler)
@@ -205,7 +222,11 @@ func Start() {
 	http.HandleFunc("/login", loginHandler)
 	http.HandleFunc("/register", registerHandler)
 	http.HandleFunc("/game-home", gameHomeHandler)
+	http.HandleFunc("/game-room", gameRoomHandler)
 	http.HandleFunc("/ws/game-home", controllers.GameWebSocket)
+	http.HandleFunc("/lobby", controllers.ServeLobbyPage)
+	http.HandleFunc("/lobby/ws", controllers.HandleWS)
+	http.HandleFunc("/waiting-room", controllers.ServeWaitingRoom)
 
 	fmt.Println("Serveur démarré sur le port 8080 ")
 	http.ListenAndServe(":8080", nil)
