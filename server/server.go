@@ -86,6 +86,9 @@ type Data struct {
 	Timer  int
 }
 
+var guess = controllers.GuessTheSong()
+var tours = 0
+
 func blindTestHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		track, err := blindtest.GetRandomTrack()
@@ -138,7 +141,6 @@ func blindTestHandler(w http.ResponseWriter, r *http.Request) {
 		tmpl.Execute(w, data)
 	}
 }
-
 
 func guessHandler(w http.ResponseWriter, r *http.Request) {
 
