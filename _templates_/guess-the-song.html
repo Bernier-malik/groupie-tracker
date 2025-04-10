@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Groupie Tracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="./css/guess-the-song.css">
+</head>
+
+<header>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#"><img class="logo" src="./public/image/logo-groupie.png" width="200"
+                    height="50" /> </a>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Salles</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        </div>
+    </nav>
+</header>
+
+<body>
+    <div class="container">
+        <h1>Guess The Song</h1>
+        <hr>
+        <div class="parameter">
+            <div class="d-flex justify-content-between align-items-center my-3">
+                <div class="timer">Timer: <span id="timer">{{.Timer}}</span>/30s</div>
+                <div class="tours">Tours: <span id="currentTour">{{.Tours}}</span> / <span id="totalTours">5</span></div>
+            </div>
+        </div>
+        <div class="lyric text-center my-4">
+            <h3>{{.Parole}}</h3>
+        </div>
+        <div class="d-flex justify-content-center">
+            <div class="form">
+                
+                <h4>Ta réponse</h4>
+                <form action="/guess-the-song" method="POST">
+                    <input type="text" class="form-control" name="userReponse" id="userReponse" placeholder="Entrez votre réponse ici" required>
+                    <button class="btn btn-primary" type="submit">Envoyer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
