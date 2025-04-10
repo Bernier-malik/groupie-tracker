@@ -34,8 +34,6 @@ func ScorBoard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
 	w.Write([]byte("Score: " + string(score)))
-	// Redirect to login page after successful registration
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
