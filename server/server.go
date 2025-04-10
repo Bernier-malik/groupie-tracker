@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"groupie/blindtest"
 	"groupie/controllers"
 	"groupie/db"
 	"html"
@@ -85,8 +86,59 @@ type Data struct {
 	Timer  int
 }
 
-var guess = controllers.GuessTheSong()
-var tours = 0
+func blindTestHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		track, err := blindtest.GetRandomTrack()
+		if err != nil {
+			http.Error(w, "Erreur lors du chargement du son", http.StatusInternalServerError)
+			return
+		}
+
+		data := struct {
+			Preview string
+			Answer  string
+			Result  string
+			Score   int
+		}{
+			Preview: track.Preview,
+			Answer:  track.Title,
+			Result:  "",
+			Score:   1,
+		}
+
+		tmpl := template.Must(template.ParseFiles("_templates_/blindTest.html"))
+		tmpl.Execute(w, data)
+
+	} else if r.Method == http.MethodPost {
+		r.ParseForm()
+		guess := r.FormValue("guess")
+		answer := r.FormValue("answer")
+		score := 1
+		var result string
+		if blindtest.CheckAnswer(guess, answer) {
+			score++
+			result = fmt.Sprintf("Bravo ! C'était bien :%s", answer)
+		} else {
+			result = fmt.Sprintf("Faux ! La bonne réponse était :%s", answer)
+		}
+
+		data := struct {
+			Preview string
+			Answer  string
+			Result  string
+			Score   int
+		}{
+			Preview: "",
+			Answer:  answer,
+			Result:  result,
+			Score:   score,
+		}
+
+		tmpl := template.Must(template.ParseFiles("_templates_/blindTest.html"))
+		tmpl.Execute(w, data)
+	}
+}
+
 
 func guessHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -191,7 +243,7 @@ func Start() {
 	http.HandleFunc("/home", homeHandler)
 	http.HandleFunc("/guess-the-song", guessHandler)
 	http.HandleFunc("/petit", petitBacHandler)
-	http.HandleFunc("/blind", BlindTestHandler)
+	http.HandleFunc("/blind", blindTestHandler)
 	http.HandleFunc("/login", loginHandler)
 	http.HandleFunc("/register", registerHandler)
 	http.HandleFunc("/game-home", gameHomeHandler)
