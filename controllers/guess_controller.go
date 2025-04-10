@@ -1,4 +1,4 @@
-package main
+package controllers
 
 import (
 	"crypto/rand"
@@ -104,6 +104,12 @@ type TrackInfo struct {
 	Lyrics  string `json:"lyrics"`
 }
 
+type TrackInfoResult struct {
+	Title  string `json:"title"`
+	Lyrics string `json:"lyrics"`
+	Tours int
+}
+
 type GeniusSearchResponse struct {
 	Response struct {
 		Hits []struct {
@@ -201,7 +207,7 @@ func searchLyricsOnGenius(title, artist, geniusToken string) (string, error) {
 	return getLyricsFromGeniusPage(songURL)
 }
 
-func delete(str string) string {
+func Delete(str string) string {
 	var frames int = len(str)
 	var result string
 	var in bool = true
@@ -224,7 +230,7 @@ func delete(str string) string {
 
 func space(str string) string {
 	var result string
-	for i:=0; i<len(str);i++ {
+	for i := 0; i < len(str); i++ {
 		if str[i] != ' ' && str[i] != ',' {
 			result += string(str[i])
 		}
@@ -239,10 +245,14 @@ func getRandomtext(lyrics string) string {
 		return "aucunes phrases"
 	}
 	var result string = a[n.Int64()]
-	return result
+	if len(result) < 40 {
+		return getRandomtext(lyrics)
+	} else {
+		return result
+	}
 }
 
-func getInfoTrack() ([]TrackInfo, string) {
+func GetInfoTrack() ([]TrackInfo, string) {
 	geniusToken := "kqpwlWVEknmSRiSnXiFLtXbFW9pv0Nn92i9jWe9qywhY8jkD0W7TaHYwDxLSigYz"
 
 	trackInfo := []TrackInfo{}
@@ -263,43 +273,54 @@ func getInfoTrack() ([]TrackInfo, string) {
 			Artist:  track.Tracks.Data[i].Artist.Name,
 			Album:   track.Tracks.Data[i].Album.Title,
 			Preview: track.Tracks.Data[i].Preview,
-			Lyrics:  delete(lyrics),
+			Lyrics:  Delete(lyrics),
 		})
 	}
 
 	return trackInfo, ""
 }
 
-func checkRep(rep string, title string) bool {
-	var newrep string = strings.ToLower(space(delete((rep))))
-	var newtitle string = strings.ToLower(space(delete(title)))
+func CheckRep(rep string, title string) bool {
+	var newrep string = strings.ToLower(space(Delete((rep))))
+	var newtitle string = strings.ToLower(space(Delete(title)))
 	return newrep == newtitle
 }
 
 func updatePoint(joueur int, rep string, title string) int {
-	if checkRep(rep,title) == true {
-		return joueur+1
+	if CheckRep(rep, title) == true {
+		return joueur + 1
 	} else {
-		return joueur 
+		return joueur
 	}
 }
 
-func main() {
-	var p1 int = 0
-	trackInfo, _ := getInfoTrack()
-	var rep string 
-	for _, track := range trackInfo {
-		
-		fmt.Println("----------------------------------------")
-		fmt.Println("Titre:", track.Title)
-		//fmt.Println("Artiste:", track.Artist)
-		//fmt.Println("Album:", track.Album)
-		fmt.Println("parole: ", getRandomtext(track.Lyrics))
-		fmt.Println(strings.ToLower(space(delete((track.Title)))))
-		fmt.Scan(&rep)
-		p1 = updatePoint(p1 , rep , track.Title)
-		fmt.Println(checkRep(rep, track.Title))
-		fmt.Println("p1: ", p1)
+func Checkrequet(w http.ResponseWriter, r *http.Request) bool {
+	rep := r.FormValue("userReponse")
+	return CheckRep(rep, "aaa")
 
+}
+
+func GuessTheSong() []TrackInfoResult {
+	trackInfo, _ := GetInfoTrack()
+	var result []TrackInfoResult
+
+	maxSongs := 5
+	count := 0
+
+
+	for _, track := range trackInfo {
+		if count >= maxSongs {
+			break
+		}
+
+		result = append(result, TrackInfoResult{
+			Title:  space(track.Title),
+			Lyrics: Delete(getRandomtext(track.Lyrics)),
+		})
+		count++
 	}
+
+
+
+	return result
 }
