@@ -81,6 +81,7 @@ func gameHomeHandler(w http.ResponseWriter, r *http.Request) {
 type Data struct {
 	Parole string
 	Tours  int
+	Titre string
 	Timer  int
 }
 
@@ -88,47 +89,19 @@ var guess = controllers.GuessTheSong()
 var tours = 0
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 func guessHandler(w http.ResponseWriter, r *http.Request) {
+
+	if tours > 4 {
+		tours = 0
+	}
 
 	data := Data{
 		Parole: guess[tours].Lyrics,
+		Titre: guess[tours].Title,
 		Tours:  tours + 1,
 		Timer:  0,
 	}
-
+	
 	go func() {
 		stop := time.After(30 * time.Second)
 		i := 0
@@ -136,13 +109,10 @@ func guessHandler(w http.ResponseWriter, r *http.Request) {
 			select {
 			case <-stop:
 				fmt.Println("EXIT: 30 seconds")
-				fmt.Println("tours ++")
-				tours++
-				data.Tours = tours
 				return
 
 			case <-time.After(1 * time.Second):
-				fmt.Println(data.Timer, "second")
+				//fmt.Println(data.Timer, "second")
 			}
 			i++
 			data.Timer = i
@@ -150,9 +120,8 @@ func guessHandler(w http.ResponseWriter, r *http.Request) {
 
 	}()
 
-	if tours > 4 {
-		tours = 0
-	}
+	
+	fmt.Println(data.Titre)
 
 	if r.Method == http.MethodGet {
 		data := Data{
