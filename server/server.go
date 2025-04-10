@@ -114,9 +114,9 @@ func blindTestHandler(w http.ResponseWriter, r *http.Request) {
 		var result string
 		if blindtest.CheckAnswer(guess, answer) {
 			score++
-			result = fmt.Sprintf("✅ Bravo ! C'était bien : <strong>%s</strong>", answer)
+			result = fmt.Sprintf("Bravo ! C'était bien :%s", answer)
 		} else {
-			result = fmt.Sprintf("❌ Mauvais ! La bonne réponse était : <strong>%s</strong>", answer)
+			result = fmt.Sprintf("Faux ! La bonne réponse était :%s", answer)
 		}
 
 		data := struct {
