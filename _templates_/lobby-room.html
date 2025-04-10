@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Petit Bac - Lobby</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom Style -->
+    <link rel="stylesheet" href="./css/game-room.css" />
+
+    <style>
+      body {
+        background-color: #180e2c;
+        color: white;
+        font-family: "Arial Rounded MT Bold", sans-serif;
+      }
+
+      .card {
+        background-color: #6d3a89;
+        border: none;
+        border-radius: 15px;
+        padding: 30px;
+        color: white;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .card h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+      }
+
+      input[type="text"] {
+        background-color: #9b61c0;
+        color: white;
+        border: none;
+        border-radius: 25px;
+        padding: 10px;
+        text-align: center;
+        width: 100%;
+        margin-bottom: 10px;
+      }
+
+      input::placeholder {
+        color: #e1d7f2;
+      }
+
+      .btn-primary {
+        background-color: #4f5bd5;
+        border: none;
+        border-radius: 25px;
+        padding: 10px 20px;
+      }
+
+      .btn-primary:hover {
+        background-color: #3d48a1;
+      }
+
+      #gameIdDisplay {
+        margin-top: 10px;
+        font-size: 16px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <nav class="navbar navbar-expand-lg custom-navbar" data-bs-theme="dark">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">
+            <img class="logo" src="./public/image/logo-groupie.png" width="200" height="50" />
+          </a>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link active" href="#">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link active" href="#">Salles</a>
+              </li>
+            </ul>
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link active" href="#">Profil</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <div class="container text-center mt-5">
+      <h1 class="mb-4">Salle de Jeu</h1>
+
+      <div class="row justify-content-center">
+        <div class="col-md-5 mb-4">
+          <div class="card">
+            <h2>Rejoindre une salle de jeu</h2>
+            <form id="joinForm" onsubmit="event.preventDefault(); joinGame();">
+              <input id="txtGameId" type="text" placeholder="Code d'accès" />
+              <button type="submit" class="btn btn-primary w-100">Rejoindre</button>
+            </form>
+          </div>
+        </div>
+        
+        <div class="col-md-5 mb-4">
+          <div class="card">
+            <h2>Créer une nouvelle partie</h2>
+            <button id="btnCreate" class="btn btn-primary w-100">Commencer</button>
+            <div id="gameIdDisplay"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WebSocket Logic -->
+    <script>
+      const gameType = "{{.GameType}}";
+      let clientId = null;
+      let pseudo = null;
+
+      const ws = new WebSocket("ws://localhost:8080/lobby/ws");
+
+      ws.onopen = () => {
+        console.log("WebSocket opened");
+      };
+
+      ws.onclose = () => {
+        console.log("WebSocket closed");
+      };
+
+      ws.onmessage = (message) => {
+        const response = JSON.parse(message.data);
+
+        if (response.method === "connect") {
+          clientId = response.clientId;
+          pseudo = response.pseudo;
+          localStorage.setItem("clientId", clientId);
+          localStorage.setItem("pseudo", pseudo);
+          localStorage.setItem("connection", response.connection);
+          console.log("Connected:", clientId, pseudo);
+        }
+
+        if (response.method === "create") {
+          const gameId = response.gameId;
+          clientId = localStorage.getItem("clientId");
+          localStorage.setItem("gameId", gameId);
+          window.location.href = `/waiting-room?id=${gameId}&game=${gameType}&pseudo=${pseudo}&client=${clientId}`;
+        }
+      };
+
+      document.getElementById("btnCreate").addEventListener("click", () => {
+        const payload = {
+          method: "create",
+          clientId: clientId,
+        };
+        ws.send(JSON.stringify(payload));
+      });
+
+      function joinGame() {
+        const gameId = document.getElementById("txtGameId").value;
+        if (!gameId) {
+          alert("Veuillez entrer un code de partie.");
+          return;
+        }
+        clientId = localStorage.getItem("clientId");
+        pseudo = localStorage.getItem("pseudo");
+
+        window.location.href = `/waiting-room?id=${gameId}&game=${gameType}&pseudo=${pseudo}&client=${clientId}`;
+      }
+    </script>
+  </body>
+</html>
