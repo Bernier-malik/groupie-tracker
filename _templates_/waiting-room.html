@@ -96,11 +96,13 @@
       const pseudo = localStorage.getItem("pseudo");
       const params = new URLSearchParams(window.location.search);
       const gameId = params.get("id");
+      const gameType = params.get("game")
       const connection =localStorage.getItem("connection");
 
       console.log(" GameId:", gameId);
       console.log(" Pseudo:", pseudo);
       console.log(" Client ID:", clientId);
+      console.log("Game type" , gameType)
       console.log("Connection:", connection)
       console.log(typeof connection) 
 
@@ -160,6 +162,8 @@
             method: "start",
             gameId: gameId,
             clientId: clientId,
+            gameType : gameType,
+            pseudo: pseudo,
           })
         );
       });

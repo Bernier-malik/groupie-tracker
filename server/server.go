@@ -94,7 +94,7 @@ func gameRoomHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func guessHandler(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("_templates_/guess-the-sound.html"))
+	tmpl := template.Must(template.ParseFiles("_templates_/guessTheSong.html"))
 	err := tmpl.Execute(w, nil)
 	if err != nil {
 		http.Error(w, "Erreur de template", http.StatusInternalServerError)

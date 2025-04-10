@@ -3,8 +3,9 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"html/template"
+	"net/http"
+
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 )
@@ -115,7 +116,8 @@ func HandleWS(w http.ResponseWriter, r *http.Request) {
 			conn.WriteMessage(websocket.TextMessage, payloadBytes)
 		case "start":
 			gameID := result["gameId"].(string)
-			//clientID := result["clientId"].(string)
+			gameType := result["gameType"].(string)
+			pseudo := result["pseudo"].(string)
 
 			game, ok := games[gameID]
 			if !ok {
@@ -132,11 +134,21 @@ func HandleWS(w http.ResponseWriter, r *http.Request) {
 				conn.WriteMessage(websocket.TextMessage, payloadBytes)
 				continue
 			}
+			var url string
+			switch gameType {
+			case "guess-the-song":
+				url = fmt.Sprintf("/guess?gameId=%s&pseudo=%s&game=%s", gameID, pseudo, gameType)
+			case "petit-bac":
+				url = fmt.Sprintf("/petit-bac?gameId=%s&pseudo=%s&game=%s", gameID, pseudo, gameType)
+			case "blind-test":
+				url = fmt.Sprintf("/blind-test?gameId=%s&pseudo=%s&game=%s", gameID, pseudo, gameType)
+			default:
+				url = fmt.Sprintf("/unknown?id=%s", gameID)
+			}
 
-			
 			startPayload := map[string]interface{}{
 				"method": "redirect",
-				"url":    fmt.Sprintf("/guess-the-sound?id=%s", gameID),
+				"url":    url,
 			}
 
 			broadcastToGame(game, startPayload)
