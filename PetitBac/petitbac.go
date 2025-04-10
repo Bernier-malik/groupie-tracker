@@ -1,4 +1,4 @@
-package petitbac
+package PetitBac
 
 import (
 	"net/http"
