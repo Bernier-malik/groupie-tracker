@@ -12,19 +12,6 @@
         crossorigin="anonymous">
     </script>
 
-<script>
-    const socket = new WebSocket("ws://localhost:8080/ws/game-home");
-
-    socket.onmessage = function(event) {
-        document.getElementById("chat").textContent += event.data + "\n";
-    };
-
-    function send() {
-        const msg = document.getElementById("msg").value;
-        socket.send(msg);
-        document.getElementById("msg").value = "";
-    }
-</script>
     <link rel="stylesheet" href="./css/game-home.css">
 </head>
 
@@ -57,23 +44,33 @@
     <h1>Choix du jeu</h1>
     <div class="container text-center">
         <div class="row">
-            <div class="col">
-                <div class="card">
-                    <h2>Blind Test</h2>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card">
-                    <h2>Petit Bac</h2>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card">
-                    <h2>Guess the song</h2>
-                </div>
-            </div>
-        </div>
+            <div class="card-container">
+                <form action="/lobby" method="GET">
+                  <input type="hidden" name="game" value="guess-the-song" />
+                  <button type="submit" class="card">🎵 Guess the Song</button>
+                </form>
+              </div>
+          
+              <div class="card-container">
+                <form action="/lobby" method="GET">
+                  <input type="hidden" name="game" value="petit-bac" />
+                  <button type="submit" class="card">📚 Petit Bac</button>
+                </form>
+              </div>
+          
+              <div class="card-container">
+                <form action="/lobby" method="GET">
+                  <input type="hidden" name="game" value="blind-test" />
+                  <button type="submit" class="card">🎧 Blind Test</button>
+                </form>
+              </div>     
     </div>
+    <script>
+        function chooseGame(type) {
+          window.location.href = `/lobby?game=${type}`;
+        }
+      </script>
+      
 </body>
 
 </html>

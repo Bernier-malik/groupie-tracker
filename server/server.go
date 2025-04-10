@@ -110,7 +110,7 @@ func Start() {
 	http.Handle("/public/", http.StripPrefix("/public/", http.FileServer(http.Dir("_templates_/"))))
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "")
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
 	})
 
 	http.HandleFunc("/home", homeHandler)

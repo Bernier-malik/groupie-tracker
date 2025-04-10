@@ -54,6 +54,6 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, cookie)
 
 	// If the password is correct, redirect to the game page
-	http.Redirect(w, r, "/lobby", http.StatusSeeOther)
+	http.Redirect(w, r, "/game-home", http.StatusSeeOther)
 	fmt.Println("Connexion réussie. Redirection vers le jeu.")
 }

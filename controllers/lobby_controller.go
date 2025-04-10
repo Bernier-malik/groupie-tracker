@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-
+	"html/template"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 )
@@ -248,5 +248,9 @@ func broadcastToGame(game *Game, payload map[string]interface{}) {
 }
 
 func ServeLobbyPage(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "_templates_/lobby-room.html")
+	gameType := r.URL.Query().Get("game")
+	tmpl := template.Must(template.ParseFiles("_templates_/lobby-room.html"))
+	tmpl.Execute(w, map[string]string{
+		"GameType": gameType,
+	})
 }
