@@ -2,7 +2,6 @@ package server
 
 import (
 	"fmt"
-	petitbac "groupie/PetitBac"
 	"groupie/controllers"
 	"groupie/db"
 	"html"
@@ -173,33 +172,9 @@ func BlindTestHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func gameRoomHandler(w http.ResponseWriter, r *http.Request) {
-	code := r.URL.Query().Get("code")
-	game, exists := petitbac.PetitBacGames[code]
-	if !exists {
-		http.NotFound(w, r)
-		return
-	}
-
-	data := struct {
-		Code       string
-		Letter     string
-		Categories []string
-	}{
-		Code:       game.Code,
-		Letter:     game.Letter,
-		Categories: []string{"Animal", "Ville", "Objet"},
-	}
-
-	tmpl := template.Must(template.ParseFiles("_templates_/game-room.html"))
-	err := tmpl.Execute(w, data)
-	if err != nil {
-		http.Error(w, "Erreur de template", http.StatusInternalServerError)
-		fmt.Println(err)
-	}
 }
 
 func createRoomHandler(w http.ResponseWriter, r *http.Request) {
-	petitbac.Start(w, r)
 }
 
 func Start() {
@@ -223,7 +198,6 @@ func Start() {
 	http.HandleFunc("/game-room", gameRoomHandler)
 	http.HandleFunc("/ws/game-home", controllers.GameWebSocket)
 	http.HandleFunc("/create-room", createRoomHandler)
-	http.HandleFunc("/submit-answer", petitbac.SubmitAnswer)
 	http.HandleFunc("/lobby", controllers.ServeLobbyPage)
 	http.HandleFunc("/lobby/ws", controllers.HandleWS)
 	http.HandleFunc("/waiting-room", controllers.ServeWaitingRoom)
