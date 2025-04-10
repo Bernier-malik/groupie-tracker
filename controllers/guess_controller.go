@@ -207,7 +207,7 @@ func searchLyricsOnGenius(title, artist, geniusToken string) (string, error) {
 	return getLyricsFromGeniusPage(songURL)
 }
 
-func delete(str string) string {
+func Delete(str string) string {
 	var frames int = len(str)
 	var result string
 	var in bool = true
@@ -273,7 +273,7 @@ func GetInfoTrack() ([]TrackInfo, string) {
 			Artist:  track.Tracks.Data[i].Artist.Name,
 			Album:   track.Tracks.Data[i].Album.Title,
 			Preview: track.Tracks.Data[i].Preview,
-			Lyrics:  delete(lyrics),
+			Lyrics:  Delete(lyrics),
 		})
 	}
 
@@ -281,8 +281,8 @@ func GetInfoTrack() ([]TrackInfo, string) {
 }
 
 func CheckRep(rep string, title string) bool {
-	var newrep string = strings.ToLower(space(delete((rep))))
-	var newtitle string = strings.ToLower(space(delete(title)))
+	var newrep string = strings.ToLower(space(Delete((rep))))
+	var newtitle string = strings.ToLower(space(Delete(title)))
 	return newrep == newtitle
 }
 
@@ -315,7 +315,7 @@ func GuessTheSong() []TrackInfoResult {
 
 		result = append(result, TrackInfoResult{
 			Title:  space(track.Title),
-			Lyrics: delete(getRandomtext(track.Lyrics)),
+			Lyrics: Delete(getRandomtext(track.Lyrics)),
 		})
 		count++
 	}
