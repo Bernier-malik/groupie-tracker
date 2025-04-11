@@ -2,7 +2,6 @@ package server
 
 import (
 	"fmt"
-	petitbac "groupie/PetitBac"
 	"groupie/blindtest"
 	"groupie/controllers"
 	"groupie/db"
@@ -10,6 +9,7 @@ import (
 	"html/template"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
@@ -80,8 +80,11 @@ func gameHomeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func petitBacHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Petit Bac")
+type Data struct {
+	Parole string
+	Tours  int
+	Titre  string
+	Timer  int
 }
 
 func blindTestHandler(w http.ResponseWriter, r *http.Request) {
@@ -166,43 +169,93 @@ func blindTestHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func gameRoomHandler(w http.ResponseWriter, r *http.Request) {
-	code := r.URL.Query().Get("code")
-	game, exists := petitbac.PetitBacGames[code]
-	if !exists {
-		http.NotFound(w, r)
-		return
+func guessHandler(w http.ResponseWriter, r *http.Request) {
+
+	if tours > 4 {
+		tours = 0
 	}
 
-	data := struct {
-		Code       string
-		Letter     string
-		Categories []string
-	}{
-		Code:       game.Code,
-		Letter:     game.Letter,
-		Categories: []string{"Animal", "Ville", "Objet"},
+	data := Data{
+		Parole: guess[tours].Lyrics,
+		Titre:  guess[tours].Title,
+		Tours:  tours + 1,
+		Timer:  0,
 	}
 
-	tmpl := template.Must(template.ParseFiles("_templates_/game-room.html"))
-	err := tmpl.Execute(w, data)
-	if err != nil {
-		http.Error(w, "Erreur de template", http.StatusInternalServerError)
-		fmt.Println(err)
+	go func() {
+		stop := time.After(30 * time.Second)
+		i := 0
+		for {
+			select {
+			case <-stop:
+				fmt.Println("EXIT: 30 seconds")
+				return
+
+			case <-time.After(1 * time.Second):
+				//fmt.Println(data.Timer, "second")
+			}
+			i++
+			data.Timer = i
+		}
+
+	}()
+
+	fmt.Println(data.Titre)
+
+	if r.Method == http.MethodGet {
+		data := Data{
+			Parole: guess[tours].Lyrics,
+			Tours:  tours + 1,
+		}
+
+		tmpl := template.Must(template.ParseFiles("_templates_/guess-the-song.html"))
+		err := tmpl.Execute(w, data)
+		if err != nil {
+			http.Error(w, "Erreur serveur", http.StatusInternalServerError)
+			fmt.Println("Erreur template :", err)
+		}
+	} else if r.Method == http.MethodPost {
+		err := r.ParseForm()
+		if err != nil {
+			http.Error(w, "Erreur dans le formulaire", http.StatusBadRequest)
+			fmt.Println("Erreur de parsing :", err)
+			return
+		}
+
+		userResponse := r.FormValue("userReponse")
+		fmt.Println("User response :", userResponse)
+
+		correct := controllers.CheckRep(userResponse, guess[tours].Title)
+		fmt.Println("Réponse correcte ?", correct)
+
+		tours++
+
+		data := Data{
+			Parole: guess[tours].Lyrics,
+			Tours:  tours + 1,
+		}
+		fmt.Println(guess[tours].Title)
+		tmpl := template.Must(template.ParseFiles("_templates_/guess-the-song.html"))
+		err = tmpl.Execute(w, data)
+		if err != nil {
+			http.Error(w, "Erreur serveur", http.StatusInternalServerError)
+			fmt.Println("Erreur template :", err)
+		}
 	}
 }
 
-func guessHandler(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("_templates_/guess-the-sound.html"))
-	err := tmpl.Execute(w, nil)
-	if err != nil {
-		http.Error(w, "Erreur de template", http.StatusInternalServerError)
-		fmt.Println(err)
-	}
+func petitBacHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "Petit Bac")
+}
+
+func BlindTestHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "Blind test")
+}
+
+func gameRoomHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func createRoomHandler(w http.ResponseWriter, r *http.Request) {
-	petitbac.Start(w, r)
 }
 
 func Start() {
@@ -213,11 +266,11 @@ func Start() {
 	http.Handle("/public/", http.StripPrefix("/public/", http.FileServer(http.Dir("_templates_/"))))
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "")
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
 	})
 
 	http.HandleFunc("/home", homeHandler)
-	http.HandleFunc("/guess", guessHandler)
+	http.HandleFunc("/guess-the-song", guessHandler)
 	http.HandleFunc("/petit", petitBacHandler)
 	http.HandleFunc("/blind", blindTestHandler)
 	http.HandleFunc("/login", loginHandler)
@@ -226,7 +279,9 @@ func Start() {
 	http.HandleFunc("/game-room", gameRoomHandler)
 	http.HandleFunc("/ws/game-home", controllers.GameWebSocket)
 	http.HandleFunc("/create-room", createRoomHandler)
-	http.HandleFunc("/submit-answer", petitbac.SubmitAnswer)
+	http.HandleFunc("/lobby", controllers.ServeLobbyPage)
+	http.HandleFunc("/lobby/ws", controllers.HandleWS)
+	http.HandleFunc("/waiting-room", controllers.ServeWaitingRoom)
 
 	fmt.Println("Serveur démarré sur le port 8080 ")
 	http.ListenAndServe(":8080", nil)
