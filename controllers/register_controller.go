@@ -7,7 +7,14 @@ import (
 	"log"
 	"net/http"
 	"strings"
+
+	"golang.org/x/crypto/bcrypt"
 )
+
+func HashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	return string(bytes), err
+}
 
 // RegisterUser handles user registration
 func RegisterUser(w http.ResponseWriter, r *http.Request) {
@@ -21,6 +28,7 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 	pseudo := r.FormValue("pseudo")
 	password := r.FormValue("password")
 	confirmPassword := r.FormValue("confirm-password")
+	HasehPassword, _ := HashPassword(password)
 
 	// Step 1: Check if passwords match
 	if password != confirmPassword {
@@ -48,7 +56,7 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//Check if password resepected cnil
-	if(password == "" || len(password) < 8 || len(password) > 20 || !strings.ContainsAny(password, "0123456789") || !strings.ContainsAny(password, "abcdefghijklmnopqrstuvwxyz") || !strings.ContainsAny(password, "ABCDEFGHIJKLMNOPQRSTUVWXYZ")) {
+	if password == "" || len(password) < 8 || len(password) > 20 || !strings.ContainsAny(password, "0123456789") || !strings.ContainsAny(password, "abcdefghijklmnopqrstuvwxyz") || !strings.ContainsAny(password, "ABCDEFGHIJKLMNOPQRSTUVWXYZ") {
 		fmt.Println("Le mot de passe doit contenir entre 8 et 20 caractères, au moins une lettre majuscule, une lettre minuscule et un chiffre.")
 		http.Redirect(w, r, "/register", http.StatusSeeOther)
 		return
@@ -56,7 +64,7 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 
 	// Step 3: Insert new user into the database
 	queryInsert := `INSERT INTO players (email, pseudo, password) VALUES (?, ?, ?)`
-	_, err = db.DB.Exec(queryInsert, email, pseudo, password)
+	_, err = db.DB.Exec(queryInsert, email, pseudo, HasehPassword)
 	if err != nil {
 		log.Println("Error inserting user:", err)
 		http.Error(w, "Error creating user", http.StatusInternalServerError)
