@@ -4,7 +4,7 @@ import (
 	"groupie/server"
 )
 
-func main() {
 
+func main() {
 	server.Start()
 }

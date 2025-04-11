@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Petit Bac - Salle de Jeu</title>
+    <style>
+      body {
+        background-color: #130426;
+        font-family: "Arial Rounded MT Bold", sans-serif;
+        color: white;
+        padding: 40px;
+      }
+
+      .room-info {
+        background-color: #1f1442;
+        padding: 20px;
+        border-radius: 10px;
+        font-size: 22px;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 30px;
+      }
+
+      .joueur {
+        background-color: #6d3a89;
+        margin: 10px 0;
+        padding: 15px;
+        border-radius: 10px;
+        font-size: 18px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .creator {
+        background-color: #9b61c0;
+      }
+
+      .star {
+        color: yellow;
+        font-size: 24px;
+      }
+
+      .btn-container {
+        display: flex;
+        justify-content: flex-end;
+        gap: 15px;
+        margin-top: 40px;
+      }
+
+      .btn {
+        padding: 12px 25px;
+        font-size: 16px;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+      }
+
+      .btn-play {
+        background-color: #4f5bd5;
+        color: white;
+      }
+
+      .btn-leave {
+        background-color: #d74a68;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Salle d'attente</h1>
+
+    <div class="room-info">
+      <div>Rejoindre la salle : <strong>{{.GameID}}</strong></div>
+      <div>{{len .Clients}}/4</div>
+    </div>
+
+    <h2>Joueurs</h2>
+    <div id="playerList">
+      {{range .Clients}}
+      <div class="joueur {{if eq .ClientID $.CreatorID}}creator{{end}}">
+        <span>{{.Pseudo}}</span>
+        {{if eq .ClientID $.CreatorID}}<span class="star">⭐</span>{{end}}
+      </div>
+      {{end}}
+    </div>
+
+    <div class="btn-container">
+      <button id="btnStart" class="btn btn-play">Jouer</button>
+      <button id="btnLeave" class="btn btn-leave">Quitter la salle</button>
+    </div>
+
+    <script>
+      ws = new WebSocket("ws://localhost:8080/lobby/ws");
+      const clientId = localStorage.getItem("clientId");
+      const pseudo = localStorage.getItem("pseudo");
+      const params = new URLSearchParams(window.location.search);
+      const gameId = params.get("id");
+      const gameType = params.get("game");
+      const connection = localStorage.getItem("connection");
+
+      console.log(" GameId:", gameId);
+      console.log(" Pseudo:", pseudo);
+      console.log(" Client ID:", clientId);
+      console.log("Game type", gameType);
+      console.log("Connection:", connection);
+      console.log(typeof connection);
+
+      ws.onopen = () => {
+        ws.send(
+          JSON.stringify({
+            method: "rejoin",
+            gameId: gameId,
+            pseudo: pseudo,
+          })
+        );
+      };
+
+      ws.onmessage = (message) => {
+        const response = JSON.parse(message.data);
+
+        if (response.method === "redirect") {
+          window.location.href = response.url;
+        }
+
+        if (response.method === "alert") {
+          alert(response.message);
+        }
+
+        if (response.method === "update") {
+          const game = response.game;
+
+          // Update room info
+          document.querySelector(".room-info").innerHTML = `
+            <div>Rejoindre la salle : <strong>${game.id}</strong></div>
+            <div>${game.clients.length}/4</div>
+          `;
+
+          const playersHTML = game.clients
+            .map((c) => {
+              const isCreator = c.clientId === game.creatorId;
+              return `
+              <div class="joueur ${isCreator ? "creator" : ""}">
+                <span>${c.pseudo}</span>
+                ${isCreator ? '<span class="star">⭐</span>' : ""}
+              </div>`;
+            })
+            .join("");
+
+          document.getElementById("playerList").innerHTML = playersHTML;
+        }
+      };
+
+      document.getElementById("btnLeave").addEventListener("click", () => {
+        //alert("Vous avez quitté la salle.");
+        ws.send(
+          JSON.stringify({
+            method: "leave",
+            gameId: gameId,
+            pseudo: pseudo,
+          })
+        );
+        window.location.href = "/lobby";
+      });
+
+      document.getElementById("btnStart").addEventListener("click", () => {
+        ws.send(
+          JSON.stringify({
+            method: "start",
+            gameId: gameId,
+            clientId: clientId,
+            gameType: gameType,
+            pseudo: pseudo,
+          })
+        );
+      });
+    </script>
+  </body>
+</html>

@@ -6,6 +6,7 @@ import (
 	"groupie/db"
 	"log"
 	"net/http"
+	"strings"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -50,6 +51,13 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 	// If the username exists
 	if err == nil {
 		fmt.Println("Le pseudo est déjà utilisé. Essayez un autre!")
+		http.Redirect(w, r, "/register", http.StatusSeeOther)
+		return
+	}
+
+	//Check if password resepected cnil
+	if password == "" || len(password) < 8 || len(password) > 20 || !strings.ContainsAny(password, "0123456789") || !strings.ContainsAny(password, "abcdefghijklmnopqrstuvwxyz") || !strings.ContainsAny(password, "ABCDEFGHIJKLMNOPQRSTUVWXYZ") {
+		fmt.Println("Le mot de passe doit contenir entre 8 et 20 caractères, au moins une lettre majuscule, une lettre minuscule et un chiffre.")
 		http.Redirect(w, r, "/register", http.StatusSeeOther)
 		return
 	}
