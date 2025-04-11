@@ -1,23 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Groupie Tracker</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="./css/blindTest.css">
+    <title>Groupie Tracker - Blind Test</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="/public/css/blindTest.css">
 </head>
 
 <body>
     <header>
         <nav class="navbar navbar-expand-lg custom-navbar" data-bs-theme="dark">
             <div class="container-fluid">
-                <a class="navbar-brand" href="#"><img class="logo" src="./public/image/logo-groupie.png" width="200" height="50" /></a>
+                <a class="navbar-brand" href="#"><img class="logo" src="/public/image/logo-groupie.png" width="200" height="50" /></a>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">Home</a></li>
@@ -38,10 +37,13 @@
         <div class="parameter">
             <div class="d-flex justify-content-between align-items-center my-3">
                 <div class="timer">Timer: <span id="timer">30</span>s</div>
-                <div class="tours">Tours: <span id="currentTour">{{.Score}}</span> / <span id="totalTours">5</span></div>
+                <div class="tours">
+                    Tours: <span id="currentTour">{{.Round}}</span> / <span id="totalTours">5</span>
+                </div>
             </div>
         </div>
 
+        {{if not .GameOver}}
         <div class="lyric text-center my-4">
             <h3>Écoute l'extrait 👇</h3>
             <audio controls autoplay>
@@ -50,20 +52,34 @@
             </audio>
         </div>
 
+        {{if .Result}}
+        <div class="alert alert-info text-center" role="alert">
+            {{.Result}}
+        </div>
+        {{end}}
+
         <div class="d-flex justify-content-center">
             <div class="form">
                 <h4 class="text-start">Ta réponse</h4>
                 <form action="/blind" method="post">
                     <input type="text" class="form-control mb-2" id="userReponse" name="guess" placeholder="Nom de la chanson" required>
                     <input type="hidden" name="answer" value="{{.Answer}}">
+                    <input type="hidden" name="score" value="{{.Score}}">
+                    <input type="hidden" name="round" value="{{.Round}}">
                     <button class="btn btn-primary float-end" type="submit" id="submitReponse">Valider</button>
                 </form>
             </div>
         </div>
-    </div>
-    <!-- DEBUG-->
-<p class="text-muted mt-4">[Réponse attendue : {{.Answer}}]</p>
+        {{else}}
+        <div class="text-center mt-5">
+            <h2 class="mb-4">🎉 Fin du Blind Test !</h2>
+            <p class="fs-4">Ton score final : <strong>{{.Score}}</strong> / 5</p>
+            <a href="/blindtest" class="btn btn-success">Rejouer</a>
+        </div>
+        {{end}}
 
+        <p class="text-muted mt-4">[Réponse attendue : {{.Answer}}]</p>
+    </div>
 </body>
 
 </html>
