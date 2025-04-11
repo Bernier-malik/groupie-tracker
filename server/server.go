@@ -79,15 +79,7 @@ func gameHomeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-type Data struct {
-	Parole string
-	Tours  int
-	Titre  string
-	Timer  int
-}
 
-var guess = controllers.GuessTheSong()
-var tours = 0
 
 func blindTestHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
@@ -141,6 +133,16 @@ func blindTestHandler(w http.ResponseWriter, r *http.Request) {
 		tmpl.Execute(w, data)
 	}
 }
+
+type Data struct {
+	Parole string
+	Tours  int
+	Titre  string
+	Timer  int
+}
+
+var guess = controllers.GuessTheSong()
+var tours = 0
 
 func guessHandler(w http.ResponseWriter, r *http.Request) {
 
