@@ -96,15 +96,15 @@
       const pseudo = localStorage.getItem("pseudo");
       const params = new URLSearchParams(window.location.search);
       const gameId = params.get("id");
-      const gameType = params.get("game")
-      const connection =localStorage.getItem("connection");
+      const gameType = params.get("game");
+      const connection = localStorage.getItem("connection");
 
       console.log(" GameId:", gameId);
       console.log(" Pseudo:", pseudo);
       console.log(" Client ID:", clientId);
-      console.log("Game type" , gameType)
-      console.log("Connection:", connection)
-      console.log(typeof connection) 
+      console.log("Game type", gameType);
+      console.log("Connection:", connection);
+      console.log(typeof connection);
 
       ws.onopen = () => {
         ws.send(
@@ -152,7 +152,14 @@
       };
 
       document.getElementById("btnLeave").addEventListener("click", () => {
-        alert("Vous avez quitté la salle.");
+        //alert("Vous avez quitté la salle.");
+        ws.send(
+          JSON.stringify({
+            method: "leave",
+            gameId: gameId,
+            pseudo: pseudo,
+          })
+        );
         window.location.href = "/lobby";
       });
 
@@ -162,7 +169,7 @@
             method: "start",
             gameId: gameId,
             clientId: clientId,
-            gameType : gameType,
+            gameType: gameType,
             pseudo: pseudo,
           })
         );

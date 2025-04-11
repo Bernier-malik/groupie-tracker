@@ -107,7 +107,7 @@ type TrackInfo struct {
 type TrackInfoResult struct {
 	Title  string `json:"title"`
 	Lyrics string `json:"lyrics"`
-	Tours int
+	Tours  int
 }
 
 type GeniusSearchResponse struct {
@@ -286,14 +286,6 @@ func CheckRep(rep string, title string) bool {
 	return newrep == newtitle
 }
 
-func updatePoint(joueur int, rep string, title string) int {
-	if CheckRep(rep, title) == true {
-		return joueur + 1
-	} else {
-		return joueur
-	}
-}
-
 func Checkrequet(w http.ResponseWriter, r *http.Request) bool {
 	rep := r.FormValue("userReponse")
 	return CheckRep(rep, "aaa")
@@ -307,7 +299,6 @@ func GuessTheSong() []TrackInfoResult {
 	maxSongs := 5
 	count := 0
 
-
 	for _, track := range trackInfo {
 		if count >= maxSongs {
 			break
@@ -319,8 +310,6 @@ func GuessTheSong() []TrackInfoResult {
 		})
 		count++
 	}
-
-
 
 	return result
 }

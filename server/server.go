@@ -86,6 +86,9 @@ type Data struct {
 	Timer  int
 }
 
+var guess = controllers.GuessTheSong()
+var tours = 0
+
 func blindTestHandler(w http.ResponseWriter, r *http.Request) {
 	const maxRounds = 5
 
@@ -134,14 +137,31 @@ func blindTestHandler(w http.ResponseWriter, r *http.Request) {
 
 		round++
 
-		if round > maxRounds {
-			data := PageData{
-				Preview:  "",
-				Answer:   answer,
-				Result:   result,
-				Score:    score,
-				Round:    round - 1,
-				GameOver: true,
+
+func guessHandler(w http.ResponseWriter, r *http.Request) {
+
+	if tours > 4 {
+		tours = 0
+	}
+
+	data := Data{
+		Parole: guess[tours].Lyrics,
+		Titre:  guess[tours].Title,
+		Tours:  tours + 1,
+		Timer:  0,
+	}
+
+	go func() {
+		stop := time.After(30 * time.Second)
+		i := 0
+		for {
+			select {
+			case <-stop:
+				fmt.Println("EXIT: 30 seconds")
+				return
+
+			case <-time.After(1 * time.Second):
+				//fmt.Println(data.Timer, "second")
 			}
 			tmpl := template.Must(template.ParseFiles("_templates_/blindTest.html"))
 			tmpl.Execute(w, data)
@@ -194,8 +214,9 @@ func Start() {
 	})
 
 	http.HandleFunc("/home", homeHandler)
-	http.HandleFunc("/petit", petitBacHandler)
-	http.HandleFunc("/blind", blindTestHandler)
+	http.HandleFunc("/guess", guessHandler)
+	http.HandleFunc("/petit-bac", petitBacHandler)
+	http.HandleFunc("/blind-test", blindTestHandler)
 	http.HandleFunc("/login", loginHandler)
 	http.HandleFunc("/register", registerHandler)
 	http.HandleFunc("/game-home", gameHomeHandler)
