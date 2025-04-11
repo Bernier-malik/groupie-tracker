@@ -137,7 +137,7 @@ func HandleWS(w http.ResponseWriter, r *http.Request) {
 			var url string
 			switch gameType {
 			case "guess-the-song":
-				url = fmt.Sprintf("/guess?gameId=%s&pseudo=%s&game=%s", gameID, pseudo, gameType)
+				url = fmt.Sprintf("/guess-the-song?gameId=%s&pseudo=%s&game=%s", gameID, pseudo, gameType)
 			case "petit-bac":
 				url = fmt.Sprintf("/petit-bac?gameId=%s&pseudo=%s&game=%s", gameID, pseudo, gameType)
 			case "blind-test":
@@ -152,6 +152,47 @@ func HandleWS(w http.ResponseWriter, r *http.Request) {
 			}
 
 			broadcastToGame(game, startPayload)
+		case "leave":
+			gameID := result["gameId"].(string)
+			pseudo := result["pseudo"].(string)
+
+			game, ok := games[gameID]
+			if !ok {
+				fmt.Println("Game not found:", gameID)
+				continue
+			}
+
+			newClients := []*ClientInfo{}
+			for _, c := range game.Clients {
+				if c.Pseudo != pseudo {
+					newClients = append(newClients, c)
+				}
+			}
+			game.Clients = newClients
+			fmt.Println(pseudo, "has left the game:", gameID)
+
+			if len(game.Clients) == 0 {
+				delete(games, gameID)
+				fmt.Println("Game", gameID, "deleted because it's empty.")
+				break
+			}
+			visibleClients := []map[string]string{}
+			for _, c := range game.Clients {
+				visibleClients = append(visibleClients, map[string]string{
+					"pseudo":   c.Pseudo,
+					"clientId": c.ClientID,
+				})
+			}
+
+			updatePayload := map[string]interface{}{
+				"method": "update",
+				"game": map[string]interface{}{
+					"id":        game.GameID,
+					"creatorId": game.CreatorID,
+					"clients":   visibleClients,
+				},
+			}
+			broadcastToGame(game, updatePayload)
 
 		case "rejoin":
 			gameID := result["gameId"].(string)
@@ -242,19 +283,14 @@ func broadcastToGame(game *Game, payload map[string]interface{}) {
 			}
 		}
 
-		if foundClient == nil {
-			fmt.Println("Client not found in clients map for pseudo:", gameClient.Pseudo)
-			continue
-		}
-
-		if foundClient.Connection == nil {
-			fmt.Println("Connection is nil for pseudo:", gameClient.Pseudo)
+		if foundClient == nil || foundClient.Connection == nil {
+			fmt.Println("Connection not found for:", gameClient.Pseudo)
 			continue
 		}
 
 		err := foundClient.Connection.WriteMessage(websocket.TextMessage, msg)
 		if err != nil {
-			fmt.Println("Error sending to pseudo", gameClient.Pseudo, ":", err)
+			fmt.Println("Error sending to:", gameClient.Pseudo, "-", err)
 		}
 	}
 }
