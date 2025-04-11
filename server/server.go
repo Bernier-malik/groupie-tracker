@@ -9,7 +9,6 @@ import (
 	"html/template"
 	"net/http"
 	"strconv"
-	"time"
 )
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
@@ -169,81 +168,6 @@ func blindTestHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func guessHandler(w http.ResponseWriter, r *http.Request) {
-
-	if tours > 4 {
-		tours = 0
-	}
-
-	data := Data{
-		Parole: guess[tours].Lyrics,
-		Titre:  guess[tours].Title,
-		Tours:  tours + 1,
-		Timer:  0,
-	}
-
-	go func() {
-		stop := time.After(30 * time.Second)
-		i := 0
-		for {
-			select {
-			case <-stop:
-				fmt.Println("EXIT: 30 seconds")
-				return
-
-			case <-time.After(1 * time.Second):
-				//fmt.Println(data.Timer, "second")
-			}
-			i++
-			data.Timer = i
-		}
-
-	}()
-
-	fmt.Println(data.Titre)
-
-	if r.Method == http.MethodGet {
-		data := Data{
-			Parole: guess[tours].Lyrics,
-			Tours:  tours + 1,
-		}
-
-		tmpl := template.Must(template.ParseFiles("_templates_/guess-the-song.html"))
-		err := tmpl.Execute(w, data)
-		if err != nil {
-			http.Error(w, "Erreur serveur", http.StatusInternalServerError)
-			fmt.Println("Erreur template :", err)
-		}
-	} else if r.Method == http.MethodPost {
-		err := r.ParseForm()
-		if err != nil {
-			http.Error(w, "Erreur dans le formulaire", http.StatusBadRequest)
-			fmt.Println("Erreur de parsing :", err)
-			return
-		}
-
-		userResponse := r.FormValue("userReponse")
-		fmt.Println("User response :", userResponse)
-
-		correct := controllers.CheckRep(userResponse, guess[tours].Title)
-		fmt.Println("Réponse correcte ?", correct)
-
-		tours++
-
-		data := Data{
-			Parole: guess[tours].Lyrics,
-			Tours:  tours + 1,
-		}
-		fmt.Println(guess[tours].Title)
-		tmpl := template.Must(template.ParseFiles("_templates_/guess-the-song.html"))
-		err = tmpl.Execute(w, data)
-		if err != nil {
-			http.Error(w, "Erreur serveur", http.StatusInternalServerError)
-			fmt.Println("Erreur template :", err)
-		}
-	}
-}
-
 func petitBacHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Petit Bac")
 }
@@ -270,7 +194,6 @@ func Start() {
 	})
 
 	http.HandleFunc("/home", homeHandler)
-	http.HandleFunc("/guess-the-song", guessHandler)
 	http.HandleFunc("/petit", petitBacHandler)
 	http.HandleFunc("/blind", blindTestHandler)
 	http.HandleFunc("/login", loginHandler)
