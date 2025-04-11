@@ -22,14 +22,12 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 	password := r.FormValue("password")
 	confirmPassword := r.FormValue("confirm-password")
 
-	// Step 1: Check if passwords match
 	if password != confirmPassword {
 		fmt.Println("Les mots de passe ne correspondent pas!")
 		http.Redirect(w, r, "/register", http.StatusSeeOther)
 		return
 	}
 
-	// Step 2: Check if username already exists
 	var existingPseudo string
 	queryCheck := "SELECT pseudo FROM players WHERE pseudo = ?"
 	err = db.DB.QueryRow(queryCheck, pseudo).Scan(&existingPseudo)
@@ -40,21 +38,18 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// If the username exists
 	if err == nil {
 		fmt.Println("Le pseudo est déjà utilisé. Essayez un autre!")
 		http.Redirect(w, r, "/register", http.StatusSeeOther)
 		return
 	}
 
-	//Check if password resepected cnil
-	if(password == "" || len(password) < 8 || len(password) > 20 || !strings.ContainsAny(password, "0123456789") || !strings.ContainsAny(password, "abcdefghijklmnopqrstuvwxyz") || !strings.ContainsAny(password, "ABCDEFGHIJKLMNOPQRSTUVWXYZ")) {
+	if password == "" || len(password) < 8 || len(password) > 20 || !strings.ContainsAny(password, "0123456789") || !strings.ContainsAny(password, "abcdefghijklmnopqrstuvwxyz") || !strings.ContainsAny(password, "ABCDEFGHIJKLMNOPQRSTUVWXYZ") {
 		fmt.Println("Le mot de passe doit contenir entre 8 et 20 caractères, au moins une lettre majuscule, une lettre minuscule et un chiffre.")
 		http.Redirect(w, r, "/register", http.StatusSeeOther)
 		return
 	}
 
-	// Step 3: Insert new user into the database
 	queryInsert := `INSERT INTO players (email, pseudo, password) VALUES (?, ?, ?)`
 	_, err = db.DB.Exec(queryInsert, email, pseudo, password)
 	if err != nil {
@@ -63,6 +58,5 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Redirect to login page after successful registration
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }

@@ -243,9 +243,9 @@ func Start() {
 	})
 
 	http.HandleFunc("/home", homeHandler)
-	http.HandleFunc("/guess-the-song", guessHandler)
-	http.HandleFunc("/petit", petitBacHandler)
-	http.HandleFunc("/blind", blindTestHandler)
+	http.HandleFunc("/guess", guessHandler)
+	http.HandleFunc("/petit-bac", petitBacHandler)
+	http.HandleFunc("/blind-test", blindTestHandler)
 	http.HandleFunc("/login", loginHandler)
 	http.HandleFunc("/register", registerHandler)
 	http.HandleFunc("/game-home", gameHomeHandler)
