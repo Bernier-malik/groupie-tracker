@@ -8,6 +8,7 @@ import (
 	"html"
 	"html/template"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -79,9 +80,18 @@ func gameHomeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
-
 func blindTestHandler(w http.ResponseWriter, r *http.Request) {
+	const maxRounds = 5
+
+	type PageData struct {
+		Preview  string
+		Answer   string
+		Result   string
+		Score    int
+		Round    int
+		GameOver bool
+	}
+
 	if r.Method == http.MethodGet {
 		track, err := blindtest.GetRandomTrack()
 		if err != nil {
@@ -89,16 +99,13 @@ func blindTestHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		data := struct {
-			Preview string
-			Answer  string
-			Result  string
-			Score   int
-		}{
-			Preview: track.Preview,
-			Answer:  track.Title,
-			Result:  "",
-			Score:   1,
+		data := PageData{
+			Preview:  track.Preview,
+			Answer:   track.Title,
+			Result:   "",
+			Score:    0,
+			Round:    1,
+			GameOver: false,
 		}
 
 		tmpl := template.Must(template.ParseFiles("_templates_/blindTest.html"))
@@ -108,25 +115,47 @@ func blindTestHandler(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
 		guess := r.FormValue("guess")
 		answer := r.FormValue("answer")
-		score := 1
+		scoreStr := r.FormValue("score")
+		roundStr := r.FormValue("round")
+
+		score, _ := strconv.Atoi(scoreStr)
+		round, _ := strconv.Atoi(roundStr)
+
 		var result string
 		if blindtest.CheckAnswer(guess, answer) {
 			score++
-			result = fmt.Sprintf("Bravo ! C'était bien :%s", answer)
+			result = fmt.Sprintf("Bravo ! C'était bien : %s", answer)
 		} else {
-			result = fmt.Sprintf("Faux ! La bonne réponse était :%s", answer)
+			result = fmt.Sprintf("Faux ! La bonne réponse était : %s", answer)
 		}
 
-		data := struct {
-			Preview string
-			Answer  string
-			Result  string
-			Score   int
-		}{
-			Preview: "",
-			Answer:  answer,
-			Result:  result,
-			Score:   score,
+		round++
+
+		if round > maxRounds {
+			data := PageData{
+				Result:   result,
+				Score:    score,
+				Round:    round,
+				GameOver: true,
+			}
+			tmpl := template.Must(template.ParseFiles("_templates_/blindTest.html"))
+			tmpl.Execute(w, data)
+			return
+		}
+
+		track, err := blindtest.GetRandomTrack()
+		if err != nil {
+			http.Error(w, "Erreur lors du chargement du son", http.StatusInternalServerError)
+			return
+		}
+
+		data := PageData{
+			Preview:  track.Preview,
+			Answer:   track.Title,
+			Result:   result,
+			Score:    score,
+			Round:    round,
+			GameOver: false,
 		}
 
 		tmpl := template.Must(template.ParseFiles("_templates_/blindTest.html"))
