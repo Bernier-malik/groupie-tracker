@@ -7,7 +7,14 @@ import (
 	"log"
 	"net/http"
 	"strings"
+
+	"golang.org/x/crypto/bcrypt"
 )
+
+func HashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	return string(bytes), err
+}
 
 // RegisterUser handles user registration
 func RegisterUser(w http.ResponseWriter, r *http.Request) {
@@ -21,6 +28,7 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 	pseudo := r.FormValue("pseudo")
 	password := r.FormValue("password")
 	confirmPassword := r.FormValue("confirm-password")
+	HasehPassword, _ := HashPassword(password)
 
 	if password != confirmPassword {
 		fmt.Println("Les mots de passe ne correspondent pas!")
@@ -51,7 +59,7 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	queryInsert := `INSERT INTO players (email, pseudo, password) VALUES (?, ?, ?)`
-	_, err = db.DB.Exec(queryInsert, email, pseudo, password)
+	_, err = db.DB.Exec(queryInsert, email, pseudo, HasehPassword)
 	if err != nil {
 		log.Println("Error inserting user:", err)
 		http.Error(w, "Error creating user", http.StatusInternalServerError)
