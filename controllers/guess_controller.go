@@ -107,7 +107,7 @@ type TrackInfo struct {
 type TrackInfoResult struct {
 	Title  string `json:"title"`
 	Lyrics string `json:"lyrics"`
-	Tours int
+	Tours  int
 }
 
 type GeniusSearchResponse struct {
@@ -307,7 +307,6 @@ func GuessTheSong() []TrackInfoResult {
 	maxSongs := 5
 	count := 0
 
-
 	for _, track := range trackInfo {
 		if count >= maxSongs {
 			break
@@ -319,8 +318,6 @@ func GuessTheSong() []TrackInfoResult {
 		})
 		count++
 	}
-
-
 
 	return result
 }

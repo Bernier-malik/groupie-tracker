@@ -1,62 +1,108 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Groupie Tracker</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="./css/guess-the-song.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guess The Song</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="./css/guessTheSong.css" />
 </head>
 
 <header>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#"><img class="logo" src="./public/image/logo-groupie.png" width="200"
-                    height="50" /> </a>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Salles</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-        </div>
-    </nav>
+  <nav class="navbar navbar-expand-lg custom-navbar" data-bs-theme="dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#"><img class="logo" src="./public/image/logo-groupie.png" width="200"
+          height="50" /> </a>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="#">Salles</a>
+          </li>
+        </ul>
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active" href="#">Profil</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
 </header>
 
 <body>
-    <div class="container">
-        <h1>Guess The Song</h1>
-        <hr>
-        <div class="parameter">
-            <div class="d-flex justify-content-between align-items-center my-3">
-                <div class="timer">Timer: <span id="timer">{{.Timer}}</span>/30s</div>
-                <div class="tours">Tours: <span id="currentTour">{{.Tours}}</span> / <span id="totalTours">5</span></div>
-            </div>
+  <div class="container">
+    <h1>Guess The Song</h1>
+    <hr>
+    <div class="parameter">
+      <div class="d-flex justify-content-between align-items-center my-3">
+        <div id="timer-display">
+          Temps restant : <span id="timer-value">--</span> secondes
         </div>
-        <div class="lyric text-center my-4">
-            <h3>{{.Parole}}</h3>
-        </div>
-        <div class="d-flex justify-content-center">
-            <div class="form">
-                
-                <h4>Ta réponse</h4>
-                <form action="/guess-the-song" method="POST">
-                    <input type="text" class="form-control" name="userReponse" id="userReponse" placeholder="Entrez votre réponse ici" required>
-                    <button class="btn btn-primary" type="submit">Envoyer</button>
-                </form>
-            </div>
-        </div>
+        <div class="tours">Tours: <span id="currentTour">{{.Round}}</span> / <span id="totalTours">5</span></div>
+      </div>
     </div>
+
+    <div class="lyric text-center my-4">
+      <h3>Extrait des paroles de la chanson</h3>
+      <p>{{.Lyric}}</p>
+    </div>
+
+    <div class="d-flex justify-content-center">
+      <div class="form">
+        <h4 class="text-start">Ta réponse</h4>
+        <form action="" method="post">
+          <input type="text" name="userReponse" class="form-control mb-2" id="userReponse" required />
+          <button class="btn btn-primary float-end" type="submit" id="submitReponse">Valider</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script>
+    const gameId = "{{.GameID}}";
+    const timerSpan = document.getElementById("timer-value");
+    let socket;
+  
+    function startWebSocket() {
+      socket = new WebSocket(`ws://localhost:8080/guess-the-song/ws?gameId=${gameId}`);
+  
+      socket.onopen = () => {
+        console.log(" Connexion WebSocket ouverte");
+      };
+  
+      socket.onmessage = (event) => {
+        const remaining = parseInt(event.data);
+        timerSpan.innerText = remaining;
+  
+        if (remaining === 0) {
+          alert("⏰ Temps écoulé !");
+          document.querySelector("form").submit();
+          socket.close();
+        }
+      };
+  
+      socket.onerror = (err) => {
+        console.error("Erreur WebSocket :", err);
+      };
+  
+      socket.onclose = (event) => {
+        console.warn(" Connexion WebSocket fermée", event.reason || "");
+        setTimeout(() => {
+          console.log(" Tentative de reconnexion WebSocket...");
+          startWebSocket(); 
+        }, 2000); 
+      };
+    }
+  
+    startWebSocket();
+  </script>
+</body>
 </body>
 
 </html>

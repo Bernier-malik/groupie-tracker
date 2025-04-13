@@ -137,7 +137,7 @@ func HandleWS(w http.ResponseWriter, r *http.Request) {
 			var url string
 			switch gameType {
 			case "guess-the-song":
-				url = fmt.Sprintf("/guess-the-song?gameId=%s&pseudo=%s&game=%s", gameID, pseudo, gameType)
+				url = fmt.Sprintf("/guess-the-song?gameId=%s", gameID)
 			case "petit-bac":
 				url = fmt.Sprintf("/petit-bac?gameId=%s&pseudo=%s&game=%s", gameID, pseudo, gameType)
 			case "blind-test":
