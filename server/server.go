@@ -196,7 +196,6 @@ func guessHandler(w http.ResponseWriter, r *http.Request) {
 				return
 
 			case <-time.After(1 * time.Second):
-				//fmt.Println(data.Timer, "second")
 			}
 			i++
 			data.Timer = i
