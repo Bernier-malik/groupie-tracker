@@ -10,7 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="./css/petitBac.css">
+    <link rel="stylesheet" href="./css/lePetitBac.css">
 </head>
 
 <header>
@@ -43,10 +43,12 @@
         <hr>
         <div class="parameter">
             <div class="d-flex justify-content-between align-items-center my-3">
-                <div class="timer">Timer: <span id="timer">30</span>s</div>
-                <div class="tours">Tours: <span id="currentTour">1</span> / <span id="totalTours">5</span></div>
+                <div class="timer">⏱️ Timer : <span id="timer">{{.Timer}}</span>s</div>
+                <div class="letter">🔠 Lettre : <strong>{{.Letter}}</strong></div>
+                <div class="tours">📝 Tours : <span id="currentTour">{{.Round}}</span> / <span id="totalTours">5</span></div>
             </div>
         </div>
+
         <div class="row m-3">
             <div class="col">
                 <div class="card">
@@ -94,15 +96,31 @@
                 </div>
             </div>
         </div>
+
         <div class="d-flex justify-content-center">
             <div class="form">
-                <h4 class="text-start">Ta réponse</h4>
-                <form action="" method="post">
-                    <input type="text" class="form-control mb-2" id="userReponse">
+                <h4 class="text-start">Ta réponse (commence par <strong>{{.Letter}}</strong>)</h4>
+                <form action="/petitbac?gameId={{.GameID}}" method="POST">
+                    <input type="text" class="form-control mb-2" id="userReponse" name="album" placeholder="Album">
+                    <input type="text" class="form-control mb-2" name="groupe" placeholder="Groupe">
+                    <input type="text" class="form-control mb-2" name="instrument" placeholder="Instrument">
+                    <input type="text" class="form-control mb-2" name="featuring" placeholder="Featuring">
                     <button class="btn btn-primary float-end" type="submit" id="submitReponse">Valider</button>
                 </form>
             </div>
         </div>
     </div>
+
+    <script>
+        const gameId = new URLSearchParams(window.location.search).get("gameId");
+        const ws = new WebSocket("ws://" + location.host + "/petitbac/ws?gameId=" + gameId);
+
+        ws.onmessage = function(event) {
+            const data = event.data;
+            if (!isNaN(parseInt(data))) {
+                document.getElementById("timer").textContent = data;
+            }
+        };
+    </script>
 </body>
 </html>

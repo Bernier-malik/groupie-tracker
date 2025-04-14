@@ -322,9 +322,14 @@ func scoreboardHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func petitBacHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Petit Bac")
+type ReponseSet struct { // pour Petit bac
+	Album      string
+	Groupe     string
+	Instrument string
+	Featuring  string
 }
+
+var reponses = make(map[string]map[int]map[string]ReponseSet)
 
 func BlindTestHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Blind test")
@@ -362,6 +367,8 @@ func Start() {
 	http.HandleFunc("/waiting-room", controllers.ServeWaitingRoom)
 	http.HandleFunc("/scoreboard", scoreboardHandler)
 	http.HandleFunc("/scoreboard/ws", scoreboardWSHandler)
+	http.HandleFunc("/petitbac", petitBacHandler)
+	http.HandleFunc("/petitbac/ws", petitBacWSHandler)
 
 	fmt.Println("Serveur démarré sur le port 8080 ")
 	http.ListenAndServe(":8080", nil)
