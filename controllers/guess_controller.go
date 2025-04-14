@@ -286,14 +286,6 @@ func CheckRep(rep string, title string) bool {
 	return newrep == newtitle
 }
 
-func updatePoint(joueur int, rep string, title string) int {
-	if CheckRep(rep, title) == true {
-		return joueur + 1
-	} else {
-		return joueur
-	}
-}
-
 func Checkrequet(w http.ResponseWriter, r *http.Request) bool {
 	rep := r.FormValue("userReponse")
 	return CheckRep(rep, "aaa")

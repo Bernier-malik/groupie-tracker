@@ -70,7 +70,6 @@ func HandleWS(w http.ResponseWriter, r *http.Request) {
 		_, msg, err := conn.ReadMessage()
 		if err != nil {
 			fmt.Println("Client disconnected:", pseudo)
-			//delete(clients, clientID)
 			break
 		}
 
@@ -97,7 +96,6 @@ func HandleWS(w http.ResponseWriter, r *http.Request) {
 			fmt.Println("Game created with ID:", gameID)
 			fmt.Println(pseudo, "created a new game")
 
-			// Add client to new game
 			game := &Game{
 				GameID:    gameID,
 				CreatorID: clientID,
@@ -107,7 +105,6 @@ func HandleWS(w http.ResponseWriter, r *http.Request) {
 			}
 			games[gameID] = game
 
-			// Send game info to client
 			createPayload := map[string]interface{}{
 				"method": "create",
 				"gameId": gameID,

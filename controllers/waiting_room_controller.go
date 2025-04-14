@@ -25,7 +25,6 @@ func ServeWaitingRoom(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Get pseudo from cookie
 	cookie, err := r.Cookie("pseudo")
 	if err != nil {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
@@ -33,7 +32,6 @@ func ServeWaitingRoom(w http.ResponseWriter, r *http.Request) {
 	}
 	pseudo := cookie.Value
 
-	// Check if player is already in the game
 	found := false
 	for _, c := range game.Clients {
 		if c.Pseudo == pseudo {
@@ -50,7 +48,6 @@ func ServeWaitingRoom(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("✅", pseudo, "a rejoint la salle", gameID)
 	}
 
-	// Render the updated template
 	tmpl, err := template.ParseFiles("_templates_/waiting-room.html")
 	if err != nil {
 		http.Error(w, "Template error", http.StatusInternalServerError)
