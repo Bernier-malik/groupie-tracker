@@ -9,7 +9,6 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -82,86 +81,134 @@ func gameHomeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func blindTestHandler(w http.ResponseWriter, r *http.Request) {
-	const maxRounds = 5
+var blindTracks []blindtest.Track
 
-	type PageData struct {
-		Preview  string
-		Answer   string
-		Result   string
-		Score    int
-		Round    int
-		GameOver bool
+func init() {
+	tracks, err := blindtest.GetTracks()
+	if err != nil {
+		log.Fatal(" Failed to load blind test tracks:", err)
 	}
+	blindTracks = tracks
+}
 
+func blindTestHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
-		track, err := blindtest.GetRandomTrack()
-		if err != nil {
-			http.Error(w, "Erreur lors du chargement du son", http.StatusInternalServerError)
+		gameId := r.URL.Query().Get("gameId")
+		cookie, err := r.Cookie("pseudo")
+		if err != nil || gameId == "" {
+			http.Error(w, "Invalid game or player", http.StatusBadRequest)
+			return
+		}
+		pseudo := cookie.Value
+
+		gameMutex.Lock()
+		if games[gameId] == nil {
+			games[gameId] = make(map[string]*PlayerState)
+		}
+		ps, exists := games[gameId][pseudo]
+		if !exists {
+			ps = &PlayerState{GameID: gameId, Pseudo: pseudo, Round: 1, Score: 0}
+			games[gameId][pseudo] = ps
+		}
+
+		if ps.Round > 5 {
+			gameMutex.Unlock()
+			http.Redirect(w, r, "/scoreboard?gameId="+gameId, http.StatusSeeOther)
 			return
 		}
 
-		data := PageData{
-			Preview:  track.Preview,
-			Answer:   track.Title,
-			Result:   "",
-			Score:    0,
-			Round:    1,
-			GameOver: false,
+		currentRound := ps.Round
+		track := blindTracks[(currentRound-1)%len(blindTracks)]
+
+		ps.RoundStart = time.Now()
+		ps.AnswerChan = make(chan bool)
+		go startRoundTimer(ps)
+		gameMutex.Unlock()
+
+		elapsed := time.Since(ps.RoundStart)
+		remaining := 30 - int(elapsed.Seconds())
+		if remaining < 0 {
+			remaining = 0
 		}
 
-		tmpl := template.Must(template.ParseFiles("templates/blindTest.html"))
+		data := struct {
+			GameID   string
+			Round    int
+			Preview  string
+			Answer   string
+			Timer    int
+			NextURL  string
+			GameOver bool
+			Score    int
+		}{
+			GameID:   gameId,
+			Round:    currentRound,
+			Preview:  track.Preview,
+			Answer:   track.Title,
+			Timer:    remaining,
+			NextURL:  "/blind?gameId=" + gameId,
+			GameOver: false,
+			Score:    ps.Score,
+		}
+
+		tmpl := template.Must(template.ParseFiles("_templates_/blindTest.html"))
 		tmpl.Execute(w, data)
 
 	} else if r.Method == http.MethodPost {
-		r.ParseForm()
-		guess := r.FormValue("guess")
-		answer := r.FormValue("answer")
-		scoreStr := r.FormValue("score")
-		roundStr := r.FormValue("round")
+		gameId := r.URL.Query().Get("gameId")
+		cookie, err := r.Cookie("pseudo")
+		if err != nil || gameId == "" {
+			http.Error(w, "Invalid game or player", http.StatusBadRequest)
+			return
+		}
+		pseudo := cookie.Value
+		userAnswer := r.FormValue("userReponse")
+		correctAnswer := r.FormValue("correctAnswer")
 
-		score, _ := strconv.Atoi(scoreStr)
-		round, _ := strconv.Atoi(roundStr)
-
-		var result string
-		if blindtest.CheckAnswer(guess, answer) {
-			score++
-			result = fmt.Sprintf("Bravo ! C'était bien : %s", answer)
-		} else {
-			result = fmt.Sprintf("Faux ! La bonne réponse était : %s", answer)
+		gameMutex.Lock()
+		ps, ok := games[gameId][pseudo]
+		if !ok {
+			gameMutex.Unlock()
+			http.Error(w, "Game session not found", http.StatusBadRequest)
+			return
 		}
 
-		round++
+		currentRound := ps.Round
+		if currentRound > 5 || currentRound != ps.Round {
+			gameMutex.Unlock()
+			http.Redirect(w, r, "/blind?gameId="+gameId, http.StatusSeeOther)
+			return
+		}
 
-		if round > maxRounds {
-			data := PageData{
-				Result:   result,
-				Score:    score,
-				Round:    round,
-				GameOver: true,
+		correct := blindtest.CheckAnswer(userAnswer, correctAnswer)
+		if correct {
+			elapsed := time.Since(ps.RoundStart)
+			remaining := int(30 - elapsed.Seconds())
+			if remaining < 0 {
+				remaining = 0
 			}
-			tmpl := template.Must(template.ParseFiles("templates/blindTest.html"))
-			tmpl.Execute(w, data)
-			return
+			ps.Score += remaining
 		}
 
-		track, err := blindtest.GetRandomTrack()
-		if err != nil {
-			http.Error(w, "Erreur lors du chargement du son", http.StatusInternalServerError)
-			return
+		ps.Round++
+		if ps.Round > 5 {
+			_, _ = db.DB.Exec("INSERT OR REPLACE INTO scores(gameId, pseudo, score) VALUES(?, ?, ?)", gameId, pseudo, ps.Score)
+			go broadcastScoreboard(gameId)
 		}
 
-		data := PageData{
-			Preview:  track.Preview,
-			Answer:   track.Title,
-			Result:   result,
-			Score:    score,
-			Round:    round,
-			GameOver: false,
+		if ps.AnswerChan != nil {
+			select {
+			case ps.AnswerChan <- correct:
+			default:
+			}
 		}
+		gameMutex.Unlock()
 
-		tmpl := template.Must(template.ParseFiles("templates/blindTest.html"))
-		tmpl.Execute(w, data)
+		if ps.Round > 5 {
+			http.Redirect(w, r, "/scoreboard?gameId="+gameId, http.StatusSeeOther)
+		} else {
+			http.Redirect(w, r, "/blind?gameId="+gameId, http.StatusSeeOther)
+		}
 	}
 }
 
@@ -351,6 +398,7 @@ func Start() {
 	http.HandleFunc("/guess-the-song", guessHandler)
 	http.HandleFunc("/guess-the-song/ws", guessTheSongWSHandler)
 	http.HandleFunc("/blind", blindTestHandler)
+	http.HandleFunc("/blind/ws", blindTestWSHandler)
 	http.HandleFunc("/login", loginHandler)
 	http.HandleFunc("/register", registerHandler)
 	http.HandleFunc("/game-home", gameHomeHandler)

@@ -121,3 +121,51 @@ func guessTheSongWSHandler(w http.ResponseWriter, r *http.Request) {
 	conn.WriteMessage(websocket.TextMessage, []byte("0"))
 	conn.Close()
 }
+func blindTestWSHandler(w http.ResponseWriter, r *http.Request) {
+	gameId := r.URL.Query().Get("gameId")
+	cookie, err := r.Cookie("pseudo")
+	if err != nil || gameId == "" {
+		http.Error(w, "Invalid session", http.StatusBadRequest)
+		return
+	}
+	pseudo := cookie.Value
+
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println("WebSocket upgrade error:", err)
+		return
+	}
+
+	gameMutex.Lock()
+	ps, ok := games[gameId][pseudo]
+	if ok {
+		ps.Conn = conn
+	}
+	gameMutex.Unlock()
+
+	if !ok {
+		conn.Close()
+		return
+	}
+
+	ticker := time.NewTicker(1 * time.Second)
+	defer ticker.Stop()
+	for remaining := 30; remaining >= 0; remaining-- {
+		err := conn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("%d", remaining)))
+		if err != nil {
+			log.Println("WebSocket write error:", err)
+			break
+		}
+
+		select {
+		case <-time.After(1 * time.Second):
+			// continue
+		case <-ps.AnswerChan:
+			conn.WriteMessage(websocket.TextMessage, []byte(" Temps arrêté"))
+			conn.Close()
+			return
+		}
+	}
+	conn.WriteMessage(websocket.TextMessage, []byte("0"))
+	conn.Close()
+}
