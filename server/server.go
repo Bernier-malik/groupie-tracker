@@ -7,7 +7,9 @@ import (
 	"groupie/db"
 	"html"
 	"html/template"
+	"log"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -79,16 +81,6 @@ func gameHomeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-type Data struct {
-	Parole string
-	Tours  int
-	Titre  string
-	Timer  int
-}
-
-var guess = controllers.GuessTheSong()
-var tours = 0
-
 func blindTestHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		track, err := blindtest.GetRandomTrack()
@@ -144,76 +136,158 @@ func blindTestHandler(w http.ResponseWriter, r *http.Request) {
 
 func guessHandler(w http.ResponseWriter, r *http.Request) {
 
-	if tours > 4 {
-		tours = 0
-	}
-
-	data := Data{
-		Parole: guess[tours].Lyrics,
-		Titre:  guess[tours].Title,
-		Tours:  tours + 1,
-		Timer:  0,
-	}
-
-	go func() {
-		stop := time.After(30 * time.Second)
-		i := 0
-		for {
-			select {
-			case <-stop:
-				fmt.Println("EXIT: 30 seconds")
-				return
-
-			case <-time.After(1 * time.Second):
-				//fmt.Println(data.Timer, "second")
-			}
-			i++
-			data.Timer = i
-		}
-
-	}()
-
-	fmt.Println(data.Titre)
-
 	if r.Method == http.MethodGet {
-		data := Data{
-			Parole: guess[tours].Lyrics,
-			Tours:  tours + 1,
+		gameId := r.URL.Query().Get("gameId")
+		if gameId == "" {
+			http.Error(w, "gameId required", http.StatusBadRequest)
+			return
+		}
+		cookie, err := r.Cookie("pseudo")
+		if err != nil {
+			http.Error(w, "Player pseudo not found in cookie", http.StatusUnauthorized)
+			return
+		}
+		pseudo := cookie.Value
+
+		gameMutex.Lock()
+		if games[gameId] == nil {
+			games[gameId] = make(map[string]*PlayerState)
+		}
+		ps, exists := games[gameId][pseudo]
+		if !exists {
+			ps = &PlayerState{GameID: gameId, Pseudo: pseudo, Round: 1, Score: 0}
+			games[gameId][pseudo] = ps
 		}
 
-		tmpl := template.Must(template.ParseFiles("_templates_/guess-the-song.html"))
-		err := tmpl.Execute(w, data)
-		if err != nil {
-			http.Error(w, "Erreur serveur", http.StatusInternalServerError)
-			fmt.Println("Erreur template :", err)
-		}
-	} else if r.Method == http.MethodPost {
-		err := r.ParseForm()
-		if err != nil {
-			http.Error(w, "Erreur dans le formulaire", http.StatusBadRequest)
-			fmt.Println("Erreur de parsing :", err)
+		if ps.Round > 5 {
+			gameMutex.Unlock()
+			http.Redirect(w, r, "/scoreboard?gameId="+gameId, http.StatusSeeOther)
 			return
 		}
 
-		userResponse := r.FormValue("userReponse")
-		fmt.Println("User response :", userResponse)
-
-		correct := controllers.CheckRep(userResponse, guess[tours].Title)
-		fmt.Println("Réponse correcte ?", correct)
-
-		tours++
-
-		data := Data{
-			Parole: guess[tours].Lyrics,
-			Tours:  tours + 1,
+		currentRound := ps.Round
+		lyricData := guess[currentRound-1].Lyrics
+		Titre := guess[currentRound-1].Title
+		fmt.Println("correct answer is :", Titre)
+		startRoundTimer(ps)
+		gameMutex.Unlock()
+		elapsed := time.Since(ps.RoundStart)
+		remaining := 30 - int(elapsed.Seconds())
+		if remaining < 0 {
+			remaining = 0
 		}
-		fmt.Println(guess[tours].Title)
-		tmpl := template.Must(template.ParseFiles("_templates_/guess-the-song.html"))
-		err = tmpl.Execute(w, data)
-		if err != nil {
-			http.Error(w, "Erreur serveur", http.StatusInternalServerError)
-			fmt.Println("Erreur template :", err)
+		data := struct {
+			GameID  string
+			Round   int
+			Lyric   string
+			Timer   int
+			NextURL string
+		}{
+			GameID: gameId,
+			Round:  currentRound,
+			Lyric:  lyricData,
+			Timer:  remaining,
 		}
+		if currentRound < 5 {
+			data.NextURL = "/guess-the-song?gameId=" + gameId
+		} else {
+			data.NextURL = "/scoreboard?gameId=" + gameId
+		}
+		if err := gameTemplate.Execute(w, data); err != nil {
+			log.Println("Template execution error:", err)
+		}
+	} else if r.Method == http.MethodPost {
+		gameId := r.URL.Query().Get("gameId")
+		cookie, err := r.Cookie("pseudo")
+		if err != nil || gameId == "" {
+			http.Error(w, "Invalid game or player", http.StatusBadRequest)
+			return
+		}
+		pseudo := cookie.Value
+		userAnswer := r.FormValue("userReponse")
+		gameMutex.Lock()
+		ps, ok := games[gameId][pseudo]
+		if !ok {
+			gameMutex.Unlock()
+			http.Error(w, "Game session not found", http.StatusBadRequest)
+			return
+		}
+		currentRound := ps.Round
+		if currentRound > 5 || currentRound != ps.Round {
+			gameMutex.Unlock()
+			http.Redirect(w, r, "/guess-the-song?gameId="+gameId, http.StatusSeeOther)
+			return
+		}
+		lyricData := guess[currentRound-1].Lyrics
+		correct := false
+		if lyricData != "" {
+			answer := guess[currentRound-1].Title
+			if strings.TrimSpace(strings.ToLower(userAnswer)) == strings.ToLower(answer) {
+				correct = true
+			}
+		}
+		if correct {
+			elapsed := time.Since(ps.RoundStart)
+			remainingSec := int(30 - elapsed.Seconds())
+			if remainingSec < 0 {
+				remainingSec = 0
+			}
+			ps.Score += remainingSec
+		}
+		ps.Round++
+		if ps.Round > 5 {
+			_, _ = db.DB.Exec("INSERT OR REPLACE INTO scores(gameId, pseudo, score) VALUES(?, ?, ?)",
+				gameId, pseudo, ps.Score)
+			go broadcastScoreboard(gameId)
+		}
+		if ps.AnswerChan != nil {
+			select {
+			case ps.AnswerChan <- correct:
+			default:
+			}
+		}
+		gameMutex.Unlock()
+
+		if ps.Round > 5 {
+			http.Redirect(w, r, "/scoreboard?gameId="+gameId, http.StatusSeeOther)
+		} else {
+			http.Redirect(w, r, "/guess-the-song?gameId="+gameId, http.StatusSeeOther)
+		}
+	}
+}
+
+func scoreboardHandler(w http.ResponseWriter, r *http.Request) {
+	gameId := r.URL.Query().Get("gameId")
+	if gameId == "" {
+		http.Error(w, "gameId required", http.StatusBadRequest)
+		return
+	}
+	// Query all players in this game, order by score ascending
+	rows, err := db.DB.Query("SELECT pseudo, score FROM scores WHERE gameId = ? ORDER BY score DESC", gameId)
+	if err != nil {
+		http.Error(w, "Database error", http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	var scores []ScoreEntry
+	for rows.Next() {
+		var entry ScoreEntry
+		if err := rows.Scan(&entry.Pseudo, &entry.Score); err == nil {
+			scores = append(scores, entry)
+		}
+	}
+
+	data := struct {
+		GameID string
+		Scores []ScoreEntry
+	}{
+		GameID: gameId,
+		Scores: scores,
+	}
+	fmt.Println(data.Scores)
+	if err := scoreboardTemplate.Execute(w, data); err != nil {
+		log.Println("Template error:", err)
 	}
 }
 
@@ -244,7 +318,7 @@ func Start() {
 
 	http.HandleFunc("/home", homeHandler)
 	http.HandleFunc("/guess-the-song", guessHandler)
-	http.HandleFunc("/petit", petitBacHandler)
+	http.HandleFunc("/guess-the-song/ws", guessTheSongWSHandler)
 	http.HandleFunc("/blind", blindTestHandler)
 	http.HandleFunc("/login", loginHandler)
 	http.HandleFunc("/register", registerHandler)
@@ -255,6 +329,8 @@ func Start() {
 	http.HandleFunc("/lobby", controllers.ServeLobbyPage)
 	http.HandleFunc("/lobby/ws", controllers.HandleWS)
 	http.HandleFunc("/waiting-room", controllers.ServeWaitingRoom)
+	http.HandleFunc("/scoreboard", scoreboardHandler)
+	http.HandleFunc("/scoreboard/ws", scoreboardWSHandler)
 
 	fmt.Println("Serveur démarré sur le port 8080 ")
 	http.ListenAndServe(":8080", nil)
