@@ -1,0 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Aldrich&family=Audiowide&display=swap');
+
+
+
+body {
+    background-color: #180e2c;
+    color: white;
+    font-family: "Arial Rounded MT Bold", sans-serif;
+}
+
+h1 {
+    color: #4E54BF;
+    text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    font-family: Audiowide;
+    font-size: 64px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.card {
+    min-height: 400px;
+    background-color: #6d3a89;
+    border: none;
+    border-radius: 15px;
+    padding: 30px;
+    color: white;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
+
+.card h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+input[type="text"] {
+    background-color: #9b61c0;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 10px;
+    text-align: center;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+input::placeholder {
+    color: #e1d7f2;
+}
+
+.btn-primary {
+    background-color: #4f5bd5;
+    border: none;
+    border-radius: 25px;
+    padding: 10px 20px;
+}
+
+.btn-primary:hover {
+    background-color: #3d48a1;
+}
+
+#gameIdDisplay {
+    margin-top: 10px;
+    font-size: 16px;
+}
