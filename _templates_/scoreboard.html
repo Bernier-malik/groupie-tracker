@@ -20,38 +20,41 @@
         <div class="box">
             <h3>Classement : </h3>
             <ul>
+                {{range .Scores}}
                 <li>
-                    <div class="players">
-                        <img src="" alt="">
-                        <h4>Joueurs 2</h4>
-                        <p>1er</p>
-                    </div>
+                  <div class="players">
+                    <h4>{{.Pseudo}}</h4>
+                    <p>{{.Score}} pts</p>
+                  </div>
                 </li>
-                <li>
-                    <div class="players">
-                        <img src="" alt="">
-                        <h4>Joueurs 3</h4>
-                        <p>2eme</p>
-                    </div>
-                </li>
-                <li>
-                    <div class="players">
-                        <img src="" alt="">
-                        <h4>Joueurs 1</h4>
-                        <p>3eme</p>
-                    </div>
-                </li>
-                <li>
-                    <div class="players">
-                        <img src="" alt="">
-                        <h4>Joueurs 4</h4>
-                        <p>4eme</p>
-                    </div>
-                </li>
-            </ul>
+                {{end}}
+              </ul>
         </div>
-        <button class="btn btn-danger">Quitter</button>
+        <form action="/game-home" method="GET">
+            <button class="btn btn-danger" type="submit">Quitter</button>
+        </form>
     </div>
-</body>
 
+    <script>
+        const gameId = "{{.GameID}}";
+        const ws = new WebSocket("ws://localhost:8080/scoreboard/ws?gameId=" + gameId);
+    
+        ws.onmessage = function(event) {
+            const scores = JSON.parse(event.data);
+            const ul = document.querySelector("ul");
+            ul.innerHTML = ""; // clear previous
+    
+            scores.forEach((entry) => {
+                const li = document.createElement("li");
+                li.innerHTML = `
+                    <div class="players">
+                        <h4>${entry.Pseudo}</h4>
+                        <p>${entry.Score} pts</p>
+                    </div>
+                `;
+                ul.appendChild(li);
+            });
+        };
+    </script>
+</body>
 </html>

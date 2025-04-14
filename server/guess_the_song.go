@@ -59,7 +59,6 @@ func startRoundTimer(ps *PlayerState) {
 			case <-timeout:
 				gameMutex.Lock()
 				if ps.Round == round {
-					ps.Round++
 					if ps.Round > 5 {
 						db.DB.Exec("INSERT OR REPLACE INTO scores(gameId, pseudo, score) VALUES(?, ?, ?)", ps.GameID, ps.Pseudo, ps.Score)
 					}

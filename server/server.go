@@ -114,7 +114,7 @@ func guessHandler(w http.ResponseWriter, r *http.Request) {
 		currentRound := ps.Round
 		lyricData := guess[currentRound-1].Lyrics
 		Titre := guess[currentRound-1].Title
-		fmt.Println(Titre)
+		fmt.Println("correct answer is :", Titre)
 		startRoundTimer(ps)
 		gameMutex.Unlock()
 		elapsed := time.Since(ps.RoundStart)
@@ -172,26 +172,21 @@ func guessHandler(w http.ResponseWriter, r *http.Request) {
 				correct = true
 			}
 		}
-		// Calculate score for this round if correct
 		if correct {
-			// time.Since gives duration since RoundStart; remaining = 30 - elapsed seconds
 			elapsed := time.Since(ps.RoundStart)
 			remainingSec := int(30 - elapsed.Seconds())
 			if remainingSec < 0 {
 				remainingSec = 0
 			}
-			ps.Score += remainingSec // add remaining time as points
+			ps.Score += remainingSec
 		}
-		// Move to the next round
 		ps.Round++
-		// If that was the last round (round 5 just answered), save the total score to DB
 		if ps.Round > 5 {
 			_, _ = db.DB.Exec("INSERT OR REPLACE INTO scores(gameId, pseudo, score) VALUES(?, ?, ?)",
 				gameId, pseudo, ps.Score)
+			go broadcastScoreboard(gameId)
 		}
-		// Signal the timer goroutine to stop (round answered)
 		if ps.AnswerChan != nil {
-			// Send true/false to AnswerChan; non-blocking send with select in case channel already closed
 			select {
 			case ps.AnswerChan <- correct:
 			default:
@@ -199,12 +194,9 @@ func guessHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		gameMutex.Unlock()
 
-		// Redirect the player to the appropriate next page
 		if ps.Round > 5 {
-			// Game over, go to scoreboard
 			http.Redirect(w, r, "/scoreboard?gameId="+gameId, http.StatusSeeOther)
 		} else {
-			// Not last round, go to next round page
 			http.Redirect(w, r, "/guess-the-song?gameId="+gameId, http.StatusSeeOther)
 		}
 	}
@@ -217,7 +209,7 @@ func scoreboardHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Query all players in this game, order by score ascending
-	rows, err := db.DB.Query("SELECT pseudo, score FROM scores WHERE gameId = ? ORDER BY score ASC", gameId)
+	rows, err := db.DB.Query("SELECT pseudo, score FROM scores WHERE gameId = ? ORDER BY score DESC", gameId)
 	if err != nil {
 		http.Error(w, "Database error", http.StatusInternalServerError)
 		return
@@ -231,6 +223,7 @@ func scoreboardHandler(w http.ResponseWriter, r *http.Request) {
 			scores = append(scores, entry)
 		}
 	}
+
 	data := struct {
 		GameID string
 		Scores []ScoreEntry
@@ -238,6 +231,7 @@ func scoreboardHandler(w http.ResponseWriter, r *http.Request) {
 		GameID: gameId,
 		Scores: scores,
 	}
+	fmt.Println(data.Scores)
 	if err := scoreboardTemplate.Execute(w, data); err != nil {
 		log.Println("Template error:", err)
 	}
@@ -282,6 +276,7 @@ func Start() {
 	http.HandleFunc("/lobby/ws", controllers.HandleWS)
 	http.HandleFunc("/waiting-room", controllers.ServeWaitingRoom)
 	http.HandleFunc("/scoreboard", scoreboardHandler)
+	http.HandleFunc("/scoreboard/ws", scoreboardWSHandler)
 
 	fmt.Println("Serveur démarré sur le port 8080 ")
 	http.ListenAndServe(":8080", nil)

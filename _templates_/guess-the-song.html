@@ -77,11 +77,11 @@
       };
   
       socket.onmessage = (event) => {
-        const remaining = parseInt(event.data);
+        const data = event.data;
+        const remaining = parseInt(data);
         timerSpan.innerText = remaining;
   
         if (remaining === 0) {
-          alert("⏰ Temps écoulé !");
           document.querySelector("form").submit();
           socket.close();
         }
