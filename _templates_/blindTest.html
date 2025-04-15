@@ -39,8 +39,8 @@
       <hr />
 
       <div class="d-flex justify-content-between my-3 text-white">
-        <div>⏱️ Timer: <span id="timer">{{.Timer}}</span>s</div>
-        <div>🎵 Tour: {{.Round}} / 5</div>
+        <div> Timer: <span id="timer">{{.Timer}}</span>s</div>
+        <div> {{.Round}} / 5 tour</div>
       </div>
 
       {{if .GameOver}}
@@ -53,7 +53,7 @@
       </div>
       {{else}}
       <div class="my-4">
-        <h3 class="text-white">🎧 Écoute l'extrait 👇</h3>
+        <h3 class="text-white"> Extrait audio de la chanson</h3>
         <audio controls autoplay>
           <source src="{{.Preview}}" type="audio/mpeg" />
           Ton navigateur ne supporte pas l'audio.
