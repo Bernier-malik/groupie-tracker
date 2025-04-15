@@ -14,14 +14,25 @@
 </head>
 
 <header>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg custom-navbar"  data-bs-theme="dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#"><img class="logo" src="./public/image/logo-groupie.png"/></a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon">
-                </span>
-            </button>
+            <a class="navbar-brand" href="#"><img class="logo" src="./public/image/logo-groupie.png" width="200" height="50"/> </a>
+               <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="#">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link active" href="#">Salles</a>
+              </li>
+            </ul>
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">Profil</a>
+                </li>
+            </ul>
+          </div>
+        </div>
         </div>
     </nav>
 </header>
@@ -32,8 +43,30 @@
             <div class="col desc">
                 <h1>Groupie Tracker</h1>
                 <p>
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-                </p>
+                    Nous accordons une importance particulière à la sécurité de vos données personnelles. Conformément aux recommandations de la CNIL (Commission Nationale de l’Informatique et des Libertés), les mesures suivantes ont été mises en place afin d’assurer leur protection :
+                    </p>
+                    
+                    <ul>
+                      <li>
+                        <strong>Chiffrement des mots de passe :</strong> Les mots de passe sont stockés de manière sécurisée à l’aide d’un algorithme de hachage robuste (par exemple, bcrypt), ce qui rend leur lecture impossible même en cas de fuite de données.
+                      </li>
+                      <li>
+                        <strong>Connexion sécurisée (HTTPS) :</strong> Toutes les communications entre votre navigateur et nos serveurs sont chiffrées via le protocole HTTPS, garantissant la confidentialité des échanges.
+                      </li>
+                      <li>
+                        <strong>Protection contre les attaques :</strong> Des mesures sont prises pour limiter les risques d’attaques de type <em>brute force</em>, <em>injection SQL</em>, <em>cross-site scripting (XSS)</em> ou <em>cross-site request forgery (CSRF)</em>.
+                      </li>
+                      <li>
+                        <strong>Accès restreint aux données :</strong> L’accès aux données est strictement limité aux personnes autorisées et nécessite une authentification avec des droits définis.
+                      </li>
+                      <li>
+                        <strong>Journalisation :</strong> Certaines actions sensibles peuvent être enregistrées dans des journaux de sécurité pour permettre la détection d’anomalies.
+                      </li>
+                    </ul>
+                    
+                    <p>
+                    Nous nous engageons à mettre à jour régulièrement nos systèmes et à appliquer les bonnes pratiques en matière de sécurité informatique, conformément aux préconisations de la CNIL.
+                    </p>
             </div>
             <div class="col form">
                 <h1>INSCRIPTION</h1>
@@ -55,6 +88,8 @@
                         <label for="confirm-password" class="form-label">Confirmer votre mot de passe</label>
                         <input type="password" class="form-control" id="confirm-password" name="confirm-password" aria-describedby="emailHelp" required>
                     </div>
+                    <div class="mb-3">
+                        <p style="color:red">Error Message</p>
                     <div class="mb-3">
                         <a class="form-label">Se connecter</a>
                     </div>

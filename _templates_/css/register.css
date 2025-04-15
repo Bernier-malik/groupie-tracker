@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Audiowide&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Aldrich&display=swap');
 
 body {
     height: 100vh;
@@ -10,13 +11,14 @@ body {
     margin-top: 20em;
     margin-bottom: 20em;
     flex-shrink: 0;
+    font-family: Aldrich;
     border-radius: 33px;
     background: #1D1340;
     box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
     display: flex;
     justify-content: center;
     align-items: center;
-    color: white;
+    color: #4E54BF;
 }
 
 .desc {
@@ -61,7 +63,7 @@ label {
     border-radius: 17px;
     background: #4E54BF;
     box-shadow: 4px 4px 4px 0px rgba(215, 242, 12, 0.32);
-    color: #D8F213;
+    color: white;
     text-align: center;
     font-family: Audiowide;
     font-size: 32px;
@@ -75,4 +77,12 @@ label {
     height: 203px;
     flex-shrink: 0;
     aspect-ratio: 361/203;
+}
+
+.custom-navbar {
+    background-color: #290041;
+}
+
+.nav-link {
+    font-family: Audiowide;
 }

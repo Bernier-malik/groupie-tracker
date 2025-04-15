@@ -1,4 +1,4 @@
-package main
+package controllers
 
 import (
 	"crypto/rand"
@@ -15,14 +15,12 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-// Structure de recheche
 type SearchResponse struct {
 	Tracks struct {
 		Items []Track `json:"items"`
 	} `json:"tracks"`
 }
 
-// Structure de l'api Deezer
 type Track struct {
 	ID            int    `json:"id"`
 	Title         string `json:"title"`
@@ -106,6 +104,12 @@ type TrackInfo struct {
 	Lyrics  string `json:"lyrics"`
 }
 
+type TrackInfoResult struct {
+	Title  string `json:"title"`
+	Lyrics string `json:"lyrics"`
+	Tours  int
+}
+
 type GeniusSearchResponse struct {
 	Response struct {
 		Hits []struct {
@@ -117,17 +121,14 @@ type GeniusSearchResponse struct {
 	} `json:"response"`
 }
 
-// Get track info from spotify
 func getTrack() (Track, error) {
 	url := "https://api.deezer.com/playlist/13701736741"
 
-	// Création de la requête
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Envoi de la requête avec un client HTTP
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -135,13 +136,11 @@ func getTrack() (Track, error) {
 	}
 	defer resp.Body.Close()
 
-	// Lecture de la réponse
 	body, readErr := ioutil.ReadAll(resp.Body)
 	if readErr != nil {
 		log.Fatal(readErr)
 	}
 
-	// Unmarshal du JSON dans ta structure
 	var track Track
 	jsonErr := json.Unmarshal(body, &track)
 	if jsonErr != nil {
@@ -208,19 +207,19 @@ func searchLyricsOnGenius(title, artist, geniusToken string) (string, error) {
 	return getLyricsFromGeniusPage(songURL)
 }
 
-func delete(str string) string {
+func Delete(str string) string {
 	var frames int = len(str)
 	var result string
 	var in bool = true
 	for i := 0; i < frames; i++ {
 		if in == true {
-			if str[i] == '[' {
+			if str[i] == '[' || str[i] == '(' {
 				in = false
 			} else {
 				result += string(str[i])
 			}
 		} else if in == false {
-			if str[i] == ']' {
+			if str[i] == ']' || str[i] == ')' {
 				in = true
 			}
 		}
@@ -229,17 +228,31 @@ func delete(str string) string {
 	return result
 }
 
+func space(str string) string {
+	var result string
+	for i := 0; i < len(str); i++ {
+		if str[i] != ' ' && str[i] != ',' {
+			result += string(str[i])
+		}
+	}
+	return result
+}
+
 func getRandomtext(lyrics string) string {
 	var a []string = strings.Split(lyrics, ",")
-	n, err := rand.Int(rand.Reader, big.NewInt(int64(len(a))))
+	n, err := rand.Int(rand.Reader, big.NewInt(int64(len(a)-2)))
 	if err != nil {
 		return "aucunes phrases"
 	}
 	var result string = a[n.Int64()]
-	return result
+	if len(result) < 40 {
+		return getRandomtext(lyrics)
+	} else {
+		return result
+	}
 }
 
-func getInfoTrack() ([]TrackInfo, string) {
+func GetInfoTrack() ([]TrackInfo, string) {
 	geniusToken := "kqpwlWVEknmSRiSnXiFLtXbFW9pv0Nn92i9jWe9qywhY8jkD0W7TaHYwDxLSigYz"
 
 	trackInfo := []TrackInfo{}
@@ -260,23 +273,43 @@ func getInfoTrack() ([]TrackInfo, string) {
 			Artist:  track.Tracks.Data[i].Artist.Name,
 			Album:   track.Tracks.Data[i].Album.Title,
 			Preview: track.Tracks.Data[i].Preview,
-			Lyrics:  delete(lyrics),
+			Lyrics:  Delete(lyrics),
 		})
 	}
 
 	return trackInfo, ""
 }
 
-func main() {
-	trackInfo, _ := getInfoTrack()
+func CheckRep(rep string, title string) bool {
+	var newrep string = strings.ToLower(space(Delete((rep))))
+	var newtitle string = strings.ToLower(space(Delete(title)))
+	return newrep == newtitle
+}
+
+func Checkrequet(w http.ResponseWriter, r *http.Request) bool {
+	rep := r.FormValue("userReponse")
+	return CheckRep(rep, "aaa")
+
+}
+
+func GuessTheSong() []TrackInfoResult {
+	trackInfo, _ := GetInfoTrack()
+	var result []TrackInfoResult
+
+	maxSongs := 5
+	count := 0
 
 	for _, track := range trackInfo {
-		fmt.Println("----------------------------------------")
-		fmt.Println("Titre:", track.Title)
-		fmt.Println("Artiste:", track.Artist)
-		fmt.Println("Album:", track.Album)
-		fmt.Println("Preview:", track.Preview)
-		fmt.Println("Paroles:", track.Lyrics)
-		fmt.Println()
+		if count >= maxSongs {
+			break
+		}
+
+		result = append(result, TrackInfoResult{
+			Title:  space(track.Title),
+			Lyrics: Delete(getRandomtext(track.Lyrics)),
+		})
+		count++
 	}
+
+	return result
 }

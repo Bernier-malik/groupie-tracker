@@ -31,12 +31,12 @@ func migrate() {
         score INTEGER DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
-	-- Songs Table
-    CREATE TABLE IF NOT EXISTS Songs (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT NOT NULL,
-        artist TEXT,
-        lyrics TEXT NOT NULL
+    
+	CREATE TABLE IF NOT EXISTS scores (
+        gameId TEXT,
+        pseudo TEXT,
+        score  INTEGER,
+        PRIMARY KEY(gameId, pseudo)
     );
 
     -- GamePlayers Table (Relationship between Players & Games)

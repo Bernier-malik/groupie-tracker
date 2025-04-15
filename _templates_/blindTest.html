@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blind Test</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="./css/blindTest.css" />
+  </head>
+  <body>
+    <header>
+        <nav class="navbar navbar-expand-lg custom-navbar" data-bs-theme="dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#"><img class="logo" src="./public/image/logo-groupie.png" width="200" height="50" /></a>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">Home</a></li>
+                        <li class="nav-item"><a class="nav-link active" href="#">Salles</a></li>
+                    </ul>
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                        <li class="nav-item"><a class="nav-link active" href="#">Profil</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container text-center mt-4">
+      <h1>Blind Test</h1>
+      <hr />
+
+      <div class="d-flex justify-content-between my-3 text-white">
+        <div> Timer: <span id="timer">{{.Timer}}</span>s</div>
+        <div> {{.Round}} / 5 tour</div>
+      </div>
+
+      {{if .GameOver}}
+      <div class="alert alert-success">
+        🎉 Fin de la partie ! Ton score final est de {{.Score}} points.
+        <br />
+        <a class="btn btn-primary mt-3" href="/blind?gameId={{.GameID}}"
+          >Rejouer</a
+        >
+      </div>
+      {{else}}
+      <div class="my-4">
+        <h3 class="text-white"> Extrait audio de la chanson</h3>
+        <audio controls autoplay>
+          <source src="{{.Preview}}" type="audio/mpeg" />
+          Ton navigateur ne supporte pas l'audio.
+        </audio>
+      </div>
+      <div class="d-flex justify-content-center">
+        <div class="form">
+            <h4 class="text-start">Ta réponse</h4>
+            <form action="/blind?gameId={{.GameID}}" method="post">
+                <input
+            type="text"
+            id="userReponse"
+            name="userReponse"
+            placeholder="Nom de la chanson"
+            required
+          />
+          <input type="hidden" name="correctAnswer" value="{{.Answer}}" />
+          <button class="btn btn-primary float-end" type="submit" id="submitReponse">Valider</button>
+            </form>
+        </div>
+    </div>
+      {{end}}
+
+      <!-- DEBUG -->
+      <p class="text-muted mt-4">[Réponse attendue : {{.Answer}}]</p>
+    </div>
+
+    <script>
+      const gameId = "{{.GameID}}";
+      const timerSpan = document.getElementById("timer");
+
+        let socket = new WebSocket(`ws://localhost:8080/blind/ws?gameId=${gameId}`);
+
+        socket.onmessage = function (event) {
+          const time = parseInt(event.data);
+          if (!isNaN(time)) {
+            timerSpan.innerText = time;
+            if (time === 0) {
+              document.querySelector("form").submit();
+              socket.close();
+            }
+          }
+        };
+
+        socket.onerror = (err) => {
+          console.error("WebSocket error:", err);
+        };
+
+        socket.onclose = () => {
+          console.warn("WebSocket fermé. Tentative de reconnexion...");
+          setTimeout(() => startWebSocket(), 2000);
+        };
+    </script>
+  </body>
+</html>
