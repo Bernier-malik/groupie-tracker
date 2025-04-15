@@ -23,6 +23,6 @@ Un extrait audio est joué et les participants doivent deviner de quelle chanson
 ## Installation
 
 ```bash
-git clone https://github.com/Bernier-malik/groupie-tracker
+git clone https://github.com/Bernier-malik/groupie-tracker.git
 cd groupie-tracker
 # go run main.go
