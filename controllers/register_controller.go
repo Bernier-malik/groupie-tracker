@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"groupie/db"
+	"html/template"
 	"log"
 	"net/http"
 	"strings"
@@ -54,8 +55,13 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 
 	if password == "" || len(password) < 8 || len(password) > 20 || !strings.ContainsAny(password, "0123456789") || !strings.ContainsAny(password, "abcdefghijklmnopqrstuvwxyz") || !strings.ContainsAny(password, "ABCDEFGHIJKLMNOPQRSTUVWXYZ") {
 		fmt.Println("Le mot de passe doit contenir entre 8 et 20 caractères, au moins une lettre majuscule, une lettre minuscule et un chiffre.")
-		http.Redirect(w, r, "/register", http.StatusSeeOther)
-		return
+		tmpl := template.Must(template.ParseFiles("templates/register.html"))
+		data := struct {
+			ShowError bool
+		}{
+			ShowError: true,
+		}
+		tmpl.Execute(w, data)
 	}
 
 	queryInsert := `INSERT INTO players (email, pseudo, password) VALUES (?, ?, ?)`
