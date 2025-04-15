@@ -3,6 +3,18 @@
 **Groupie Tracker** est une application regroupant trois mini-jeux multijoueurs, conçus pour être joués à deux ou plus.  
 L’objectif du projet est de proposer une plateforme simple, interactive et conviviale, permettant de s’amuser tout en explorant différents aspects du développement de site internet.
 
+## Contributeurs
+
+Ce projet a été réalisé avec la participation de :
+
+- BERNIER Malik
+- ABOU KHECHFE Yehya
+- TAFONO  Anaïs
+- HOFFMANN Corentin
+- BEN GUENDIA Yacine 
+
+Merci à tous les contributeurs pour leur travail et leur implication dans le projet !
+
 ## Présentation des jeux
 
 ### 1 Le Petit Bac  
